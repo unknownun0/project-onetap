@@ -242,7 +242,7 @@ const normalizePhotoPath = value => {
   return cleaned.replace(/^\/+/, '');
 };
 
-const STORAGE_KEY = 'profile-card-roland-tamayo-v2';
+const STORAGE_KEY = 'profile-card-onetap-v2';
 const DEFAULTS = {
   name: 'Onetap',
   nickname: '',
@@ -257,7 +257,7 @@ const DEFAULTS = {
   email: 'Onetaplaspinas@gmail.com',
   email2: '',
   
-  photo: 'logo.jng',
+  photo: 'logo.jpg',
   social: {
     facebook: 'https://www.facebook.com/onetap.nfc.ph',
     facebookPage: 'onetap.nfc.ph',
@@ -278,7 +278,7 @@ function loadProfile() {
 
   const cleanProfile = {
     ...finalProfile,
-    photo: normalizePhotoPath(DEFAULTS.photo),
+    photo: normalizePhotoPath(finalProfile.photo || DEFAULTS.photo),
     social: {
       ...DEFAULTS.social,
       ...(finalProfile.social || {}),
@@ -434,7 +434,6 @@ document.getElementById('details').append(
   row({ icon: 'user', label: 'Save contact', value: 'Add to contacts', action: saveContact }),
   row({ icon: 'user',    label: 'Name',           value: P.name }),
   row({ icon: 'user',    label: 'Bio',            value: P.bio }),
-  row({ icon: 'nick',    label: 'Nickname',       value: P.nickname }),
   row({ icon: 'company', label: 'Company',        value: P.company }),
   row({ icon: 'job',     label: 'Position',       value: P.position }),
   ...[P.contact1Value, P.contact2Value, P.contact3Value].map((value, index) => value ? row({
@@ -446,7 +445,6 @@ document.getElementById('details').append(
   row({ icon: 'pin',     label: 'Address',        value: P.address,
         href: 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(P.address) }),
   row({ icon: 'mail',    label: 'Gmail',          value: P.email,  href: 'mailto:' + P.email }),
-  row({ icon: 'mail',    label: 'UP email',       value: P.email2, href: 'mailto:' + P.email2 })
 );
 
 const socialEntries = [
