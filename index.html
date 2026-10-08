@@ -206,10 +206,10 @@
       </div>
 
       <div class="stats">
-        <div class="stat"><b id="companyStatA">ENDLESS CONNECTION FOR YOU AND YOUR BUSINESS</b><span></span></div>
+        <div class="stat"><b id="companyStatA">Endless Connection</b><span></span></div>
       </div>
 
-      <button class="follow" id="follow" type="button" aria-pressed="false">ORDER NOW</button>
+      <button class="follow" id="follow" type="button" aria-pressed="false">order </button>
     </div>
 
     <button class="grab" id="openBtn" type="button" aria-label="Show contact info"><i></i></button>
@@ -242,22 +242,28 @@ const normalizePhotoPath = value => {
   return cleaned.replace(/^\/+/, '');
 };
 
-const STORAGE_KEY = 'profile-card-ariel-olveros-v2';
+const STORAGE_KEY = 'profile-card-roland-tamayo-v2';
 const DEFAULTS = {
-  name: 'ONETAPLASPINAS',
+  name: 'Onetap',
+  nickname: '',
   position: 'Owner',
-  company: 'Onetaplaspinas',
-  bio: 'ENDLESS CONNECTION FOR YOU AND YOUR BUSINESS',
+  company: 'onetap',
+  bio: 'endless connection for you and your businesss',
   contact1Label: 'CONTACT',
-  contact1Value: '09624238760',
-  address: 'Las Pinas City, Metro Manila, Philippines',
-  email: 'onetaplaspinas@gmail.com',
- 
-  photo: 'logo.png',
+  contact1Value: '0991 062 4915',
+  contact2Label: 'CONTACT',
+  contact2Value: '0962 423 8760',
+  address: 'las Piñas City, Philippines 1740',
+  email: 'Onetaplaspinas@gmail.com',
+  email2: '',
+  
+  photo: 'logo.jng',
   social: {
     facebook: 'https://www.facebook.com/onetap.nfc.ph',
-    instagram: 'https://www.instagram.com/onetap.laspinas',
-    whatsapp: '+63 917 509 9536'
+    facebookPage: 'onetap.nfc.ph',
+    linkedin: '',
+    Youtube: '',
+    whatsapp: '0991 062 4915'
   }
 };
 
@@ -346,6 +352,8 @@ const ICONS = {
   linkedin: svg('<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>'),
   wechat: svg('<path d="M9 4C5.4 4 2.5 6.3 2.5 9.2c0 1.6.9 3.1 2.3 4L4.3 15.5l2.4-1.2c.5.1 1 .2 1.5.2"/><path d="M21.5 14.2c0-2.6-2.5-4.7-5.5-4.7s-5.5 2.1-5.5 4.7 2.5 4.7 5.5 4.7c.7 0 1.3-.1 1.9-.3l2 1-.4-2c1.1-.8 2-2 2-3.4z"/>'),
   whatsapp: svg('<path d="M3 21l1.65-4.9A9 9 0 1 1 8 19.4L3 21z"/><path d="M9 9c0 3.5 3 6.5 6 6l1-1.5-2-1-1 .8c-1-.5-1.8-1.3-2.3-2.3l.8-1-1-2z"/>'),
+  youtube: svg('<path d="M22 12s0-3.2-.4-4.7a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.5a2.5 2.5 0 0 0-1.8 1.8C2 8.8 2 12 2 12s0 3.2.4 4.7a2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.5a2.5 2.5 0 0 0 1.8-1.8C22 15.2 22 12 22 12z"/><path d="m10 9 5 3-5 3z"/>'),
+  telegram: svg('<path d="M22 3L2 11l7 2.5L11.5 21l3-5 5 3.5L22 3z"/><path d="M9 13.5L22 3"/>'),
   link: svg('<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>')
 };
 document.querySelectorAll('[data-icon]').forEach(el => { el.innerHTML = ICONS[el.dataset.icon]; });
@@ -390,7 +398,7 @@ function saveContact() {
     'BEGIN:VCARD',
     'VERSION:3.0',
     `FN:${escapeVCard(P.name)}`,
-    'N:OLVEROS;ARIEL F.;;;',
+    'N:Onetap;;;;',
     `ORG:${escapeVCard(P.company)}`,
     `TITLE:${escapeVCard(P.position)}`,
     `NOTE:${escapeVCard(P.bio)}`,
@@ -438,14 +446,15 @@ document.getElementById('details').append(
   row({ icon: 'pin',     label: 'Address',        value: P.address,
         href: 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(P.address) }),
   row({ icon: 'mail',    label: 'Gmail',          value: P.email,  href: 'mailto:' + P.email }),
+  row({ icon: 'mail',    label: 'UP email',       value: P.email2, href: 'mailto:' + P.email2 })
 );
 
 const socialEntries = [
+  S.whatsapp ? row({ icon: 'whatsapp', label: 'WhatsApp', value: S.whatsapp, href: 'https://wa.me/' + digits(S.whatsapp).replace(/^\+/, '') }) : null,
+  S.viber ? row({ icon: 'viber', label: 'Viber', value: S.whatsapp, href: 'https://viber.com/' + digits(S.whatsapp).replace(/^\+/, '') }) : null,
   S.facebook ? row({ icon: 'facebook', label: 'Facebook', value: S.facebook, href: S.facebook }) : null,
-  S.facebookPage ? row({ icon: 'facebook', label: 'Facebook page', value: S.facebookPage, href: S.facebookPage }) : null,
   S.linkedin ? row({ icon: 'linkedin', label: 'LinkedIn', value: S.linkedin, href: S.linkedin }) : null,
-  S.instagram ? row({ icon: 'instagram', label: 'Instagram', value: S.instagram, href: S.instagram }) : null,
-  S.whatsapp ? row({ icon: 'whatsapp', label: 'WhatsApp', value: S.whatsapp, href: 'https://wa.me/' + digits(S.whatsapp).replace(/^\+/, '') }) : null
+  S.youtube ? row({ icon: 'youtube', label: 'YouTube', value: S.youtube, href: S.youtube }) : null
 ].filter(Boolean);
 
 document.getElementById('socials').append(...socialEntries);
