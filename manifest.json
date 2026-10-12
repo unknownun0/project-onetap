@@ -4,8 +4,8 @@
   "description": "Offline-capable digital profile card",
   "start_url": "/index.html",
   "display": "standalone",
-  "background_color": "#f7f0f1",
-  "theme_color": "#5a0712",
+  "background_color": "#050505",
+  "theme_color": "#050505",
   "orientation": "portrait-primary",
   "scope": "/",
   "icons": [

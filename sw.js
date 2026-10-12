@@ -1,5 +1,5 @@
-// Service Worker for offline caching
-const CACHE_NAME = 'profile-card-v4';
+const CACHE_NAME = 'profile-card-v5';
+const CACHE_PREFIX = 'profile-card-';
 const ASSETS = [
   '/',
   '/index.html',
@@ -9,68 +9,63 @@ const ASSETS = [
   '/product/WhatsApp Image 2026-10-11 at 7.30.57 PM.jpeg',
   '/faq/840431903_122121899745472644_986702108616552243_n.jpg',
   '/faq/825286818_122121899739472644_1771896882386086272_n.jpg',
-  '/faq/825271622_122122381509472644_2844501410843404043_n.jpg',
-  'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap',
-  'https://fonts.gstatic.com/s/plusjakartasans/v9/6NuA92YF9W3hXHbL88aUuweUbFsM.woff2'
+  '/faq/825271622_122122381509472644_2844501410843404043_n.jpg'
 ];
 
-// Install - cache all assets
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(ASSETS.map(url => new Request(url, { credentials: 'omit' }))))
+      .then(cache => cache.addAll(ASSETS))
       .then(() => self.skipWaiting())
   );
 });
 
-// Activate - clean old caches
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(keys => 
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
+    caches.keys()
+      .then(keys => Promise.all(
+        keys
+          .filter(key => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME)
+          .map(key => caches.delete(key))
+      ))
+      .then(() => self.clients.claim())
   );
 });
 
-// Fetch - serve from cache, fallback to network
 self.addEventListener('fetch', event => {
   const { request } = event;
-  
-  // Skip non-GET requests
   if (request.method !== 'GET') return;
-  
-  // Skip chrome-extension, etc.
-  if (!request.url.startsWith('http')) return;
-  
-  event.respondWith(
-    caches.match(request).then(cached => {
-      // Return cached version if available
-      if (cached) return cached;
-      
-      // Otherwise fetch from network
-      return fetch(request).then(response => {
-        // Don't cache opaque responses (cross-origin no-cors)
-        if (!response || response.status !== 200 || response.type === 'opaque') {
-          return response;
-        }
-        
-        // Cache the new response
-        const responseClone = response.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(request, responseClone));
-        return response;
-      }).catch(() => {
-        // Offline fallback for HTML pages
-        if (request.mode === 'navigate') {
-          return caches.match('/index.html');
-        }
-      });
-    })
-  );
-});
 
-// Handle messages from clients
-self.addEventListener('message', event => {
-  if (event.data === 'skipWaiting') {
-    self.skipWaiting();
+  const requestUrl = new URL(request.url);
+  if (requestUrl.origin !== self.location.origin) return;
+
+  if (request.mode === 'navigate') {
+    event.respondWith((async () => {
+      try {
+        const response = await fetch(request);
+        if (response.ok) {
+          const cache = await caches.open(CACHE_NAME);
+          await cache.put(request, response.clone());
+        }
+        return response;
+      } catch (error) {
+        const cached = await caches.match(request) || await caches.match('/index.html');
+        if (cached) return cached;
+        throw error;
+      }
+    })());
+    return;
   }
+
+  event.respondWith((async () => {
+    const cached = await caches.match(request);
+    if (cached) return cached;
+
+    const response = await fetch(request);
+    if (response.ok) {
+      const cache = await caches.open(CACHE_NAME);
+      await cache.put(request, response.clone());
+    }
+    return response;
+  })());
 });
