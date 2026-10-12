@@ -14,14 +14,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --page-bg: #f7f0f1;
-    --ink: #2a0a0d;
-    --muted: #7a4d53;
-    --line: #f0dfe1;
-    --sheet-bg: #fff9fa;
-    --card: #ffffff;
-    --tile: #f7ecee;
-    --grad: linear-gradient(90deg, #5a0712 0%, #7d0f20 45%, #a01d2d 100%);
+    --page-bg: #050505;
+    --ink: #f5f5f3;
+    --muted: #b7b0aa;
+    --line: rgba(255,255,255,.08);
+    --sheet-bg: #0f0f10;
+    --card: #151515;
+    --tile: #1d1d1d;
+    --grad: linear-gradient(90deg, #0a0a0a 0%, #191919 35%, #d4af37 100%);
     --ease: cubic-bezier(.32, .72, 0, 1);
     --dur: 380ms;
     box-sizing: border-box;
@@ -29,15 +29,17 @@
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) { --page-bg: #0c0b10; }
+    :root:not([data-theme="light"]) { --page-bg: #050505; }
   }
-  :root[data-theme="dark"] { --page-bg: #0c0b10; }
+  :root[data-theme="dark"] { --page-bg: #050505; }
 
   html { scroll-padding-top: env(safe-area-inset-top, 0px); height: 100%; }
   *, *::before, *::after { box-sizing: inherit; }
   body {
     margin: 0; height: auto;
-    background: var(--page-bg);
+    background:
+      radial-gradient(circle at top, rgba(212,175,55,.14), transparent 26%),
+      #050505;
     display: grid; place-items: center;
     font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     color: var(--ink);
@@ -57,7 +59,7 @@
     background: #000;
     border-radius: 36px;
     overflow: auto;
-    box-shadow: 0 30px 80px rgba(0,0,0,.35);
+    box-shadow: 0 30px 80px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.06);
     isolation: isolate;
   }
   @media (max-width: 430px) {
@@ -92,7 +94,8 @@
   }
   .glass {
     height: 40px; border: 0; color: #fff;
-    background: rgba(0,0,0,.38);
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.08);
     -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
     display: inline-flex; align-items: center; justify-content: center; gap: 8px;
     border-radius: 999px;
@@ -119,6 +122,7 @@
   .follow {
     margin-top: 18px; width: 100%; height: 56px; border: 0; border-radius: 999px;
     background: var(--grad); color: #fff; font-size: 16px; font-weight: 700;
+    box-shadow: 0 18px 30px rgba(212,175,55,.18);
     transition: transform 160ms ease, background 200ms ease;
   }
   .follow:active { transform: scale(.98); }
@@ -153,6 +157,48 @@
   }
   .group { background: var(--card); border-radius: 20px; overflow: hidden; }
   .section-title { margin: 24px 4px 10px; font-size: 15px; font-weight: 700; }
+
+  .product-grid {
+    display: grid; gap: 12px; padding: 12px; background: transparent; border-radius: 0; overflow: visible;
+  }
+  .product-card {
+    background: var(--card); border-radius: 18px; overflow: hidden; box-shadow: 0 8px 22px rgba(16, 6, 12, 0.08);
+  }
+  .product-card img {
+    display: block; width: 100%; height: 220px; object-fit: cover; background: #f0e0e5;
+  }
+  .product-meta {
+    padding: 14px 16px 16px; display: grid; gap: 2px;
+  }
+  .product-meta strong {
+    font-size: 15px; font-weight: 800; letter-spacing: -.01em;
+  }
+  .product-meta span {
+    font-size: 12px; color: var(--muted);
+  }
+
+  .faq-list {
+    display: grid; gap: 10px; padding: 10px 12px 12px; background: transparent; border-radius: 0; overflow: visible;
+  }
+  .faq-item {
+    background: var(--card); border-radius: 16px; padding: 12px 14px; box-shadow: 0 6px 18px rgba(16, 6, 12, 0.06);
+  }
+  .faq-item img {
+    display: block; width: 100%; height: 180px; object-fit: cover; border-radius: 12px; margin-bottom: 10px; background: #f0e0e5;
+  }
+  .faq-question {
+    margin: 0 0 6px; font-size: 15px; font-weight: 800; line-height: 1.3;
+  }
+  .faq-answer {
+    margin: 0; font-size: 13px; line-height: 1.55; color: var(--muted);
+  }
+  .review-wrap {
+    padding: 8px 0 0;
+  }
+  .review-button {
+    width: 100%; height: 52px; border: 0; border-radius: 16px; font-weight: 800; background: var(--grad); color: #fff;
+    box-shadow: 0 14px 28px rgba(90, 7, 18, 0.2);
+  }
 
   .row {
     display: flex; align-items: center; gap: 14px; width: 100%;
@@ -191,9 +237,7 @@
     <div class="shade"></div>
     <div class="dim"></div>
 
-    <div class="topbar">
-      <button class="glass round" type="button" aria-label="Back" data-icon="back"></button>
-    </div>
+    <div class="topbar"></div>
 
     <div class="info">
       <h1 class="name" id="heroName"></h1>
@@ -225,6 +269,13 @@
       <div class="group" id="details"></div>
       <h3 class="section-title">Social media</h3>
       <div class="group" id="socials"></div>
+      <h3 class="section-title">Products</h3>
+      <div class="product-grid" id="products"></div>
+      <h3 class="section-title">FAQ</h3>
+      <div class="faq-list" id="faq"></div>
+      <div class="review-wrap">
+        <button class="review-button" type="button" id="leaveReview">Leave a review</button>
+      </div>
     </div>
   </section>
 
@@ -244,23 +295,23 @@ const normalizePhotoPath = value => {
 
 const STORAGE_KEY = 'profile-card-onetap-v2';
 const DEFAULTS = {
-  name: 'Onetap',
-  nickname: '',
+  name: 'Onetaplaspinas',
+  nickname: '@onetap.laspinas',
   position: 'Owner',
-  company: 'onetap',
+  company: 'onetaplaspinas',
   bio: 'endless connection for you and your businesss',
   contact1Label: 'CONTACT',
   contact1Value: '0991 062 4915',
   contact2Label: 'CONTACT',
   contact2Value: '0962 423 8760',
   address: 'las Piñas City, Philippines 1740',
-  email: 'Onetaplaspinas@gmail.com',
+  email: 'onetaplaspinas@gmail.com',
   email2: '',
-  
-  photo: 'logo.jpg',
+  photo: 'profile.jpg',
   social: {
     facebook: 'https://www.facebook.com/onetap.nfc.ph',
-    facebookPage: 'onetap.nfc.ph',
+    facebookPage: 'https://www.facebook.com/onetap.nfc.ph',
+    instagram: 'https://www.instagram.com/onetap.laspinas/',
     linkedin: '',
     Youtube: '',
     whatsapp: '0991 062 4915'
@@ -284,6 +335,7 @@ function loadProfile() {
       ...(finalProfile.social || {}),
       facebook: DEFAULTS.social.facebook,
       facebookPage: DEFAULTS.social.facebookPage,
+      instagram: DEFAULTS.social.instagram,
       linkedin: DEFAULTS.social.linkedin,
       Youtube: DEFAULTS.social.Youtube,
       whatsapp: DEFAULTS.social.whatsapp
@@ -425,7 +477,7 @@ function saveContact() {
 
 const P = PROFILE, S = PROFILE.social;
 document.getElementById('heroName').textContent = P.name;
-document.getElementById('heroHandle').textContent = '@' + P.nickname.toLowerCase().replace(/\s+/g, '');
+document.getElementById('heroHandle').textContent = '@' + strip(P.nickname).toLowerCase().replace(/\s+/g, '');
 
 const companyName = P.company || 'University of Perpetual Help';
 document.getElementById('companyStatA').textContent = companyName;
@@ -449,13 +501,66 @@ document.getElementById('details').append(
 
 const socialEntries = [
   S.whatsapp ? row({ icon: 'whatsapp', label: 'WhatsApp', value: S.whatsapp, href: 'https://wa.me/' + digits(S.whatsapp).replace(/^\+/, '') }) : null,
-  S.viber ? row({ icon: 'viber', label: 'Viber', value: S.whatsapp, href: 'https://viber.com/' + digits(S.whatsapp).replace(/^\+/, '') }) : null,
   S.facebook ? row({ icon: 'facebook', label: 'Facebook', value: S.facebook, href: S.facebook }) : null,
+  S.instagram ? row({ icon: 'instagram', label: 'Instagram', value: S.instagram, href: S.instagram }) : null,
   S.linkedin ? row({ icon: 'linkedin', label: 'LinkedIn', value: S.linkedin, href: S.linkedin }) : null,
-  S.youtube ? row({ icon: 'youtube', label: 'YouTube', value: S.youtube, href: S.youtube }) : null
+  S.youtube ? row({ icon: 'youtube', label: 'YouTube', value: S.youtube, href: S.youtube }) : null,
+  row({ icon: 'link', label: 'Leave a review', value: 'Facebook page', href: S.facebookPage || S.facebook })
 ].filter(Boolean);
 
 document.getElementById('socials').append(...socialEntries);
+
+const productImages = [
+  'product/WhatsApp Image 2026-10-11 at 7.30.57 PM.jpeg'
+];
+const productsWrap = document.getElementById('products');
+productImages.forEach((src, index) => {
+  const article = document.createElement('article');
+  article.className = 'product-card';
+  article.innerHTML = `
+    <img src="${src}" alt="Onetap product ${index + 1}">
+    <div class="product-meta">
+      <strong>Onetap product</strong>
+      <span>Premium local service and lifestyle essentials</span>
+    </div>
+  `;
+  productsWrap.appendChild(article);
+});
+
+const faqItems = [
+  {
+    image: 'faq/840431903_122121899745472644_986702108616552243_n.jpg',
+    question: 'What is Onetap?',
+    answer: 'Onetap is a lifestyle and business connection brand built to help customers and partners discover simple, reliable solutions for everyday needs.'
+  },
+  {
+    image: 'faq/825286818_122121899739472644_1771896882386086272_n.jpg',
+    question: 'How can I contact Onetap?',
+    answer: 'You can contact us through Facebook, Instagram, WhatsApp, or by calling our available numbers listed in the contact section.'
+  },
+  {
+    image: 'faq/825271622_122122381509472644_2844501410843404043_n.jpg',
+    question: 'Can I leave a review?',
+    answer: 'Yes. You can leave a review on our Facebook page and share your experience with the Onetap community.'
+  }
+];
+
+const faqWrap = document.getElementById('faq');
+faqItems.forEach(item => {
+  const card = document.createElement('div');
+  card.className = 'faq-item';
+  card.innerHTML = `
+    <img src="${item.image}" alt="${item.question}">
+    <h4 class="faq-question">${item.question}</h4>
+    <p class="faq-answer">${item.answer}</p>
+  `;
+  faqWrap.appendChild(card);
+});
+
+document.getElementById('leaveReview').addEventListener('click', () => {
+  const reviewUrl = S.facebookPage || S.facebook || 'https://www.facebook.com/onetap.nfc.ph';
+  window.open(reviewUrl, '_blank', 'noopener,noreferrer');
+});
 
 /* ---------- Follow toggle ---------- */
 const follow = document.getElementById('follow');
