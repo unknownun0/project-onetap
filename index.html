@@ -1,672 +1,644 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Profile</title>
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#050505">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Profile">
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👤</text></svg>">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --page-bg: #050505;
-    --ink: #f5f5f3;
-    --muted: #b7b0aa;
-    --line: rgba(255,255,255,.08);
-    --sheet-bg: #0f0f10;
-    --card: #151515;
-    --tile: #1d1d1d;
-    --grad: linear-gradient(90deg, #0a0a0a 0%, #191919 35%, #d4af37 100%);
-    --ease: cubic-bezier(.32, .72, 0, 1);
-    --dur: 380ms;
-    box-sizing: border-box;
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) { --page-bg: #050505; }
-  }
-  :root[data-theme="dark"] { --page-bg: #050505; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneTap Las Piñas — Digital Profile & NFC Business Card</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 
-  html { scroll-padding-top: env(safe-area-inset-top, 0px); height: 100%; }
-  *, *::before, *::after { box-sizing: inherit; }
-  body {
-    margin: 0; height: auto;
-    background:
-      radial-gradient(circle at top, rgba(212,175,55,.14), transparent 26%),
-      #050505;
-    display: grid; place-items: center;
-    font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    color: var(--ink);
-    -webkit-font-smoothing: antialiased;
-    overflow: auto;
-  }
-  button { font: inherit; color: inherit; cursor: pointer; }
-  :focus-visible { outline: 2px solid #ff5fa2; outline-offset: 2px; }
-  svg { display: block; }
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        stealth: {
+                            deep: '#0b0c10',
+                            card: '#13151b',
+                            surface: '#1a1d24',
+                            border: '#262a34'
+                        },
+                        titanium: {
+                            dark: '#2c2f38',
+                            DEFAULT: '#4e5361',
+                            muted: '#717788',
+                            light: '#8f95a5',
+                            tint: '#b8bcc7'
+                        },
+                        oatmilk: {
+                            DEFAULT: '#f6f3eb',
+                            card: '#ede7db',
+                            dark: '#dfd7c5',
+                            pure: '#ffffff'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
 
-  /* ---------- Phone frame ---------- */
-  .app {
-    --p: 0;
-    position: relative;
-    width: min(390px, 100%);
-    height: min(844px, 100vh);
-    background: #000;
-    border-radius: 36px;
-    overflow: auto;
-    box-shadow: 0 30px 80px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.06);
-    isolation: isolate;
-  }
-  @media (max-width: 430px) {
-    .app { width: 100%; height: 100vh; height: 100dvh; border-radius: 0; box-shadow: none; }
-    body { background: #000; }
-  }
+    <style>
+        body {
+            background-color: #0b0c10;
+            color: #f6f3eb;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-  /* ---------- Hero (dark card) ---------- */
-  .hero {
-    position: absolute; inset: 0;
-    background: var(--page-bg); color: #fff;
-    transform-origin: 50% 0;
-    transform: translateY(calc(var(--p) * 14px)) scale(calc(1 - var(--p) * .08));
-    border-radius: calc(var(--p) * 28px);
-    overflow: hidden;
-    touch-action: none;
-    user-select: none; -webkit-user-select: none;
-  }
-  .photo { position: absolute; left: 0; right: 0; top: 0; height: 62%; }
-  .photo svg, .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .shade {
-    position: absolute; inset: 0;
-    background: linear-gradient(180deg,
-      rgba(0,0,0,.38) 0%, rgba(0,0,0,0) 22%,
-      rgba(0,0,0,0) 34%, rgba(0,0,0,.8) 54%, #000 63%);
-  }
-  .dim { position: absolute; inset: 0; background: #000; opacity: calc(var(--p) * .55); pointer-events: none; }
+        /* 3D Perspective Card Container */
+        .card-perspective-container {
+            perspective: 1200px;
+        }
 
-  .topbar {
-    position: absolute; top: 16px; left: 16px; right: 16px; z-index: 3;
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .glass {
-    height: 40px; border: 0; color: #fff;
-    background: rgba(255,255,255,.04);
-    border: 1px solid rgba(255,255,255,.08);
-    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
-    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    border-radius: 999px;
-  }
-  .glass.round { width: 40px; }
-  .glass.pill { padding: 0 16px; font-size: 14px; font-weight: 600; }
-  .glass svg { width: 20px; height: 20px; }
-  .glass.pill svg { width: 16px; height: 16px; }
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1.586 / 1;
+            transition: transform 0.75s cubic-bezier(0.23, 1, 0.32, 1);
+            transform-style: preserve-3d;
+        }
 
-  .info { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 24px 40px; z-index: 2; }
-  .name { margin: 0; font-size: 32px; line-height: 1.1; font-weight: 800; letter-spacing: -.02em; text-align: center; }
-  .handle { margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 6px; color: #9a97a6; font-size: 14px; }
-  .badge { width: 18px; height: 18px; }
+        .flip-card-inner.flipped {
+            transform: rotateY(180deg);
+        }
 
-  .stats {
-    margin-top: 22px; display: grid; grid-template-columns: 1fr; background: rgba(255,255,255,.08);
-    border-radius: 20px; padding: 14px 0;
-  }
-  .stat { text-align: center; padding: 0 12px; }
-  .stat + .stat { display: none; }
-  .stat b { display: block; font-size: 18px; line-height: 1.2; font-weight: 800; letter-spacing: -.01em; overflow-wrap: anywhere; }
-  .stat span { display: block; margin-top: 2px; font-size: 12px; color: #d8c5c8; }
+        .card-face {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            overflow: hidden;
+            user-select: none;
+            box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+        }
 
-  .follow {
-    margin-top: 18px; width: 100%; height: 56px; border: 0; border-radius: 999px;
-    background: var(--grad); color: #fff; font-size: 16px; font-weight: 700;
-    box-shadow: 0 18px 30px rgba(212,175,55,.18);
-    transition: transform 160ms ease, background 200ms ease;
-  }
-  .follow:active { transform: scale(.98); }
-  .follow.on { background: rgba(255,255,255,.12); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.3); }
+        .card-back {
+            transform: rotateY(180deg);
+        }
 
-  .grab {
-    position: absolute; left: 50%; bottom: 6px; z-index: 3;
-    width: 72px; height: 28px; margin-left: -36px;
-    background: none; border: 0; padding: 0;
-    display: grid; place-items: center;
-  }
-  .grab i { display: block; width: 36px; height: 4px; border-radius: 4px; background: rgba(255,255,255,.4); }
+        /* Concentric Radar Rings mirroring the OneTap Card Vector */
+        .radar-circle {
+            position: absolute;
+            border-radius: 9999px;
+            pointer-events: none;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 1.5px solid currentColor;
+        }
 
-  /* ---------- Detail sheet ---------- */
-  .sheet {
-    position: absolute; left: 0; right: 0; bottom: 0; top: 84px; z-index: 5;
-    background: var(--sheet-bg);
-    border-radius: 28px 28px 0 0;
-    box-shadow: 0 -12px 40px rgba(0,0,0,.3);
-    display: flex; flex-direction: column;
-    transform: translateY(calc((1 - var(--p)) * 100%));
-  }
-  .sheet-head { padding: 6px 20px 4px; touch-action: none; user-select: none; -webkit-user-select: none; }
-  .sheet-grab { display: grid; place-items: center; width: 100%; height: 24px; background: none; border: 0; padding: 0; }
-  .sheet-grab i { display: block; width: 44px; height: 5px; border-radius: 5px; background: #cfcbd6; }
-  .sheet-head h2 { margin: 4px 0 0; font-size: 20px; font-weight: 800; letter-spacing: -.01em; }
+        .radar-c1 {
+            left: 20%;
+            width: 100px;
+            height: 100px;
+            opacity: 0.16;
+            margin-left: -50px;
+        }
 
-  .sheet-scroll {
-    flex: 1; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y;
-    padding: 10px 16px calc(28px + env(safe-area-inset-bottom, 0px));
-    -webkit-overflow-scrolling: touch;
-  }
-  .group { background: var(--card); border-radius: 20px; overflow: hidden; }
-  .section-title { margin: 24px 4px 10px; font-size: 15px; font-weight: 700; }
+        .radar-c2 {
+            left: 20%;
+            width: 220px;
+            height: 220px;
+            opacity: 0.10;
+            margin-left: -110px;
+        }
 
-  .product-grid {
-    display: grid; gap: 12px; padding: 12px; background: transparent; border-radius: 0; overflow: visible;
-  }
-  .product-card {
-    background: var(--card); border-radius: 18px; overflow: hidden; box-shadow: 0 8px 22px rgba(16, 6, 12, 0.08);
-  }
-  .product-card img {
-    display: block; width: 100%; height: 220px; object-fit: cover; background: #f0e0e5;
-  }
-  .product-meta {
-    padding: 14px 16px 16px; display: grid; gap: 2px;
-  }
-  .product-meta strong {
-    font-size: 15px; font-weight: 800; letter-spacing: -.01em;
-  }
-  .product-meta span {
-    font-size: 12px; color: var(--muted);
-  }
+        .radar-c3 {
+            left: 20%;
+            width: 320px;
+            height: 320px;
+            opacity: 0.06;
+            margin-left: -160px;
+        }
 
-  .faq-list {
-    display: grid; gap: 10px; padding: 10px 12px 12px; background: transparent; border-radius: 0; overflow: visible;
-  }
-  .faq-item {
-    background: var(--card); border-radius: 16px; padding: 12px 14px; box-shadow: 0 6px 18px rgba(16, 6, 12, 0.06);
-  }
-  .faq-item img {
-    display: block; width: 100%; height: 180px; object-fit: cover; border-radius: 12px; margin-bottom: 10px; background: #f0e0e5;
-  }
-  .faq-question {
-    margin: 0 0 6px; font-size: 15px; font-weight: 800; line-height: 1.3;
-  }
-  .faq-answer {
-    margin: 0; font-size: 13px; line-height: 1.55; color: var(--muted);
-  }
-  .review-wrap {
-    padding: 8px 0 0;
-  }
-  .review-button {
-    width: 100%; height: 52px; border: 0; border-radius: 16px; font-weight: 800; background: var(--grad); color: #fff;
-    box-shadow: 0 14px 28px rgba(90, 7, 18, 0.2);
-  }
+        /* Gloss / Sheen overlay */
+        .card-specular {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.25) 100%);
+            pointer-events: none;
+        }
 
-  .row {
-    display: flex; align-items: center; gap: 14px; width: 100%;
-    padding: 13px 16px; text-align: left; text-decoration: none; color: inherit;
-    background: none; border: 0;
-  }
-  .row + .row { border-top: 1px solid var(--line); }
-  .row.tap { transition: background 150ms ease; }
-  .row.tap:active { background: #f7f6fa; }
-  .ico { flex: none; width: 40px; height: 40px; border-radius: 12px; background: var(--tile); display: grid; place-items: center; }
-  .ico svg { width: 20px; height: 20px; }
-  .txt { flex: 1; min-width: 0; }
-  .lbl { display: block; font-size: 12px; color: var(--muted); }
-  .val { display: block; margin-top: 1px; font-size: 15px; font-weight: 600; overflow-wrap: anywhere; }
-  .go { flex: none; color: #b3afbf; }
-  .go svg { width: 18px; height: 18px; }
+        /* Glassmorphic micro-card */
+        .glass-panel {
+            background: rgba(26, 29, 36, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(78, 83, 97, 0.25);
+        }
 
-  /* ---------- Motion ---------- */
-  .app:not(.dragging) .hero,
-  .app:not(.dragging) .sheet { transition: transform var(--dur) var(--ease), border-radius var(--dur) var(--ease); }
-  .app:not(.dragging) .dim { transition: opacity var(--dur) var(--ease); }
-  @media (prefers-reduced-motion: reduce) {
-    .app:not(.dragging) .hero,
-    .app:not(.dragging) .sheet,
-    .app:not(.dragging) .dim { transition-duration: 1ms; }
-  }
-</style>
+        .glass-panel:hover {
+            border-color: rgba(143, 149, 165, 0.45);
+            background: rgba(26, 29, 36, 0.9);
+        }
+
+        /* Toast animation */
+        #feedbackToast {
+            transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.25s ease;
+            transform: translate(-50%, 120%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #feedbackToast.active {
+            transform: translate(-50%, 0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
 </head>
-<body>
+<body class="min-h-screen py-4 px-3 sm:px-6 flex items-center justify-center selection:bg-titanium selection:text-oatmilk-pure">
 
-<main class="app" id="app">
+    <!-- Mobile-First Container -->
+    <main class="w-full max-w-[425px] bg-stealth-card border border-stealth-border rounded-[36px] shadow-2xl p-5 sm:p-6 relative overflow-hidden my-auto flex flex-col">
+        
+        <!-- Ambient Background Lights -->
+        <div class="absolute -top-20 -left-20 w-52 h-52 bg-titanium-dark/30 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute top-1/3 -right-24 w-52 h-52 bg-titanium/15 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-10 left-10 w-44 h-44 bg-oatmilk-dark/5 rounded-full blur-2xl pointer-events-none"></div>
 
-  <!-- Card 1: photo profile -->
-  <section class="hero" id="hero" aria-label="Profile">
-    <div class="photo" id="photo"></div>
-    <div class="shade"></div>
-    <div class="dim"></div>
+        <!-- App Bar / Top Navigation -->
+        <header class="flex items-center justify-between pb-3.5 border-b border-stealth-border/80 relative z-10">
+            <div class="flex items-center gap-2.5">
+                <!-- OneTap Target Symbol -->
+                <div class="w-7 h-7 rounded-full bg-stealth-surface border border-titanium-dark flex items-center justify-center">
+                    <div class="w-3.5 h-3.5 rounded-full border border-oatmilk flex items-center justify-center">
+                        <div class="w-1.5 h-1.5 rounded-full bg-oatmilk"></div>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="text-xs font-bold tracking-wider text-oatmilk uppercase leading-none">OneTap</h1>
+                    <span class="text-[9px] text-titanium-light font-mono tracking-widest uppercase">Las Piñas</span>
+                </div>
+            </div>
 
-    <div class="topbar"></div>
+            <!-- Card Theme Switcher -->
+            <button id="themeToggleBtn" type="button" class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-stealth-surface border border-stealth-border text-[11px] font-medium text-titanium-tint hover:text-oatmilk hover:border-titanium-light transition">
+                <i data-lucide="layers" class="w-3 h-3"></i>
+                <span id="themeToggleText">Carbon Black</span>
+            </button>
+        </header>
 
-    <div class="info">
-      <h1 class="name" id="heroName"></h1>
-      <div class="handle">
-        <span id="heroHandle"></span>
-        <svg class="badge" viewBox="0 0 24 24" role="img" aria-label="Verified">
-          <path fill="#3d9bff" d="M12 1.5l2.6 1.9 3.2-.1 1 3 2.6 1.9-1 3.1 1 3.1-2.6 1.9-1 3-3.2-.1L12 22.5l-2.6-1.9-3.2.1-1-3-2.6-1.9 1-3.1-1-3.1 2.6-1.9 1-3 3.2.1z"/>
-          <path d="M8 12.2l2.7 2.7L16 9.6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
+        <!-- 3D Interactive Card Section -->
+        <section class="mt-4 mb-3 relative z-10">
+            <div class="flex items-center justify-between text-[11px] text-titanium-light px-1 mb-2 font-mono">
+                <span class="flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                    <span>NFC CONNECT</span>
+                </span>
+                <span class="opacity-75 tracking-wider">TAP CARD TO FLIP</span>
+            </div>
 
-      <div class="stats">
-        <div class="stat"><b id="companyStatA">Endless Connection</b><span></span></div>
-      </div>
+            <div class="card-perspective-container cursor-pointer select-none" id="nfcCardWrapper" role="button" aria-label="Toggle front and back card view">
+                <div class="flip-card-inner" id="nfcCardInner">
+                    
+                    <!-- ========== CARD FRONT ========== -->
+                    <div id="cardFront" class="card-face bg-[#101217] text-[#f6f3eb] border border-[#2a2d39] p-5 flex flex-col justify-between transition-colors duration-300">
+                        <!-- Concentric Vectors -->
+                        <div class="radar-circle radar-c1"></div>
+                        <div class="radar-circle radar-c2"></div>
+                        <div class="radar-circle radar-c3"></div>
+                        <div class="card-specular"></div>
 
-      <button class="follow" id="follow" type="button" aria-pressed="false">order </button>
-    </div>
+                        <!-- Card Header -->
+                        <div class="flex items-start justify-between relative z-10">
+                            <div class="flex items-center gap-2">
+                                <div class="w-5 h-5 rounded-full border border-current flex items-center justify-center">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-current"></div>
+                                </div>
+                                <div>
+                                    <h3 class="text-xs font-extrabold tracking-wider leading-none">OneTapLasPiñas</h3>
+                                    <p class="text-[7.5px] tracking-[0.22em] opacity-70 mt-0.5 font-mono">NFC SMART CARD</p>
+                                </div>
+                            </div>
 
-    <button class="grab" id="openBtn" type="button" aria-label="Show contact info"><i></i></button>
-  </section>
+                            <!-- Contactless Waves -->
+                            <div class="flex flex-col items-end">
+                                <i data-lucide="wifi" class="w-4 h-4 rotate-90 opacity-90"></i>
+                                <span class="text-[7px] tracking-widest font-mono uppercase mt-1 opacity-60">Tap To Connect</span>
+                            </div>
+                        </div>
 
-  <!-- Card 2: detail panel -->
-  <section class="sheet" id="sheet" aria-label="Contact info" aria-hidden="true" inert>
-    <div class="sheet-head" id="sheetHead">
-      <button class="sheet-grab" id="closeBtn" type="button" aria-label="Back to profile"><i></i></button>
-      <h2>Contact info</h2>
-    </div>
-    <div class="sheet-scroll" id="list">
-      <div class="group" id="details"></div>
-      <h3 class="section-title">Social media</h3>
-      <div class="group" id="socials"></div>
-      <h3 class="section-title">Products</h3>
-      <div class="product-grid" id="products"></div>
-      <h3 class="section-title">FAQ</h3>
-      <div class="faq-list" id="faq"></div>
-      <div class="review-wrap">
-        <button class="review-button" type="button" id="leaveReview">Leave a review</button>
-      </div>
-    </div>
-  </section>
+                        <!-- Card Footer -->
+                        <div class="relative z-10 flex items-end justify-between pt-4">
+                            <div>
+                                <span class="text-[8px] uppercase tracking-widest text-titanium-light font-mono block">Digital Identity</span>
+                                <span class="text-sm font-semibold tracking-wide text-oatmilk-pure mt-0.5 block">Official Business Card</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[9px] font-mono tracking-widest px-2 py-0.5 rounded border border-current/20 opacity-80">LP • 2026</span>
+                            </div>
+                        </div>
+                    </div>
 
-</main>
+                    <!-- ========== CARD BACK ========== -->
+                    <div id="cardBack" class="card-face card-back bg-[#101217] text-[#f6f3eb] border border-[#2a2d39] p-5 flex items-center justify-between transition-colors duration-300">
+                        <div class="radar-circle radar-c1"></div>
+                        <div class="radar-circle radar-c2"></div>
+                        <div class="radar-circle radar-c3"></div>
+                        <div class="card-specular"></div>
 
-<script>
-/* ---------- Default profile data ---------- */
-const normalizePhotoPath = value => {
-  if (!value || typeof value !== 'string') return '';
-  const cleaned = value.replace(/\\/g, '/').trim();
-  if (!cleaned) return '';
-  if (/^[a-zA-Z]:\//.test(cleaned) || /^file:\//i.test(cleaned)) {
-    return cleaned.split('/').pop() || '';
-  }
-  return cleaned.replace(/^\/+/, '');
-};
+                        <!-- Left Info of Back Face -->
+                        <div class="relative z-10 h-full flex flex-col justify-between max-w-[50%]">
+                            <div class="flex items-center gap-1.5">
+                                <div class="w-4 h-4 rounded-full border border-current flex items-center justify-center">
+                                    <div class="w-1 h-1 rounded-full bg-current"></div>
+                                </div>
+                                <span class="text-[10px] font-bold tracking-wider">OneTap LP</span>
+                            </div>
 
-const STORAGE_KEY = 'profile-card-onetap-v3';
-const DEFAULTS = {
-  name: 'Onetaplaspinas',
-  nickname: '@onetap.laspinas',
-  position: 'Owner',
-  company: 'onetaplaspinas',
-  bio: 'endless connection for you and your businesss',
-  contact1Label: 'CONTACT',
-  contact1Value: '0991 062 4915',
-  contact2Label: 'CONTACT',
-  contact2Value: '0962 423 8760',
-  address: 'las Piñas City, Philippines 1740',
-  email: 'onetaplaspinas@gmail.com',
-  email2: '',
-  photo: 'profile.jpg',
-  social: {
-    facebook: 'https://www.facebook.com/onetap.nfc.ph',
-    facebookPage: 'https://www.facebook.com/onetap.nfc.ph',
-    instagram: 'https://www.instagram.com/onetap.laspinas/',
-    linkedin: '',
-    Youtube: '',
-    whatsapp: '0991 062 4915'
-  }
-};
+                            <div class="my-auto py-1">
+                                <p class="text-[9px] font-medium opacity-85 leading-tight">Instant networking via NFC & Dynamic QR.</p>
+                                <p class="text-[7.5px] font-mono opacity-60 mt-1 uppercase tracking-wider">No app needed</p>
+                            </div>
 
-function loadProfile() {
-  const saved = (() => {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch (e) { return null; }
-  })();
+                            <p class="text-[8px] font-mono tracking-wider opacity-60">onetap.lp/connect</p>
+                        </div>
 
-  const finalProfile = saved && typeof saved === 'object'
-    ? { ...DEFAULTS, ...saved, photo: normalizePhotoPath(saved.photo || DEFAULTS.photo), social: { ...DEFAULTS.social, ...(saved.social || {}) } }
-    : { ...DEFAULTS, photo: normalizePhotoPath(DEFAULTS.photo) };
+                        <!-- Right QR Frame of Back Face -->
+                        <div class="relative z-10 flex flex-col items-center justify-center pl-2">
+                            <div class="w-24 h-24 p-2 rounded-xl bg-white shadow-md flex flex-col items-center justify-center">
+                                <!-- Clean Vector QR Code -->
+                                <svg class="w-full h-full text-black" viewBox="0 0 100 100" fill="currentColor">
+                                    <rect x="6" y="6" width="28" height="28" rx="4" fill="none" stroke="black" stroke-width="6"/>
+                                    <rect x="14" y="14" width="12" height="12"/>
+                                    <rect x="66" y="6" width="28" height="28" rx="4" fill="none" stroke="black" stroke-width="6"/>
+                                    <rect x="74" y="14" width="12" height="12"/>
+                                    <rect x="6" y="66" width="28" height="28" rx="4" fill="none" stroke="black" stroke-width="6"/>
+                                    <rect x="14" y="74" width="12" height="12"/>
+                                    <!-- QR matrix dots -->
+                                    <rect x="44" y="10" width="8" height="8"/>
+                                    <rect x="44" y="26" width="8" height="18"/>
+                                    <rect x="10" y="44" width="18" height="8"/>
+                                    <rect x="74" y="44" width="18" height="8"/>
+                                    <rect x="44" y="44" width="12" height="12"/>
+                                    <rect x="44" y="66" width="8" height="24"/>
+                                    <rect x="64" y="64" width="10" height="10"/>
+                                    <rect x="80" y="76" width="10" height="14"/>
+                                    <rect x="64" y="80" width="10" height="10"/>
+                                </svg>
+                            </div>
+                            <span class="text-[8px] font-mono tracking-[0.25em] opacity-70 mt-1.5 uppercase">SCAN ME</span>
+                        </div>
+                    </div>
 
-  const cleanProfile = {
-    ...finalProfile,
-    photo: normalizePhotoPath(finalProfile.photo || DEFAULTS.photo),
-    social: {
-      ...DEFAULTS.social,
-      ...(finalProfile.social || {}),
-      facebook: DEFAULTS.social.facebook,
-      facebookPage: DEFAULTS.social.facebookPage,
-      instagram: DEFAULTS.social.instagram,
-      linkedin: DEFAULTS.social.linkedin,
-      Youtube: DEFAULTS.social.Youtube,
-      whatsapp: DEFAULTS.social.whatsapp
-    }
-  };
+                </div>
+            </div>
 
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(cleanProfile));
-  return cleanProfile;
-}
-const PROFILE = loadProfile();
-const photoEl = document.getElementById('photo');
-const placeholderPhoto = `
-  <svg viewBox="0 0 390 523" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Profile photo placeholder">
-    <defs>
-      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#ffb46b"/>
-        <stop offset=".5" stop-color="#e9527f"/>
-        <stop offset="1" stop-color="#4d3aa8"/>
-      </linearGradient>
-      <radialGradient id="glow" cx=".5" cy=".38" r=".5">
-        <stop offset="0" stop-color="#fff" stop-opacity=".35"/>
-        <stop offset="1" stop-color="#fff" stop-opacity="0"/>
-      </radialGradient>
-    </defs>
-    <rect width="390" height="523" fill="url(#bg)"/>
-    <rect width="390" height="523" fill="url(#glow)"/>
-    <path d="M40 523c0-92 65-146 155-146s155 54 155 146z" fill="#26123f" opacity=".55"/>
-    <circle cx="195" cy="255" r="72" fill="#26123f" opacity=".55"/>
-  </svg>
-`;
+            <!-- Flip Action Button -->
+            <div class="flex justify-center mt-2.5">
+                <button id="manualFlipBtn" class="text-[11px] text-titanium-light hover:text-oatmilk inline-flex items-center gap-1.5 py-1 px-3 rounded-full hover:bg-stealth-surface transition">
+                    <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+                    <span>Flip Card Preview</span>
+                </button>
+            </div>
+        </section>
 
-function renderProfilePhoto() {
-  if (PROFILE.photo) {
-    const img = new Image();
-    img.src = PROFILE.photo;
-    img.alt = 'Profile photo';
-    img.onload = () => {
-      photoEl.innerHTML = '';
-      photoEl.appendChild(img);
-    };
-    img.onerror = () => {
-      photoEl.innerHTML = placeholderPhoto;
-    };
-    photoEl.appendChild(img);
-    return;
-  }
-  photoEl.innerHTML = placeholderPhoto;
-}
-renderProfilePhoto();
+        <!-- Profile Section -->
+        <section class="text-center mt-2 relative z-10 flex flex-col items-center">
+            <!-- Profile Avatar with subtle glow ring -->
+            <div class="relative w-20 h-20 rounded-full p-[2.5px] bg-gradient-to-tr from-titanium-dark via-titanium to-oatmilk shadow-xl">
+                <div class="w-full h-full rounded-full overflow-hidden bg-stealth-surface flex items-center justify-center">
+                    <img 
+                        src="project-onetap/profile.jpg" 
+                        alt="Profile avatar" 
+                        class="w-full h-full object-cover"
+                        onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';"
+                    />
+                </div>
+                <!-- Verified Badge -->
+                <div class="absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full bg-stealth-card p-0.5 flex items-center justify-center">
+                    <div class="w-full h-full rounded-full bg-oatmilk text-stealth-deep flex items-center justify-center">
+                        <i data-lucide="check" class="w-3 h-3 stroke-[3.5]"></i>
+                    </div>
+                </div>
+            </div>
 
-/* ---------- Icons (line) ---------- */
-const svg = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
-const ICONS = {
-  back: svg('<path d="M19 12H5M12 19l-7-7 7-7"/>'),
-  edit: svg('<path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>'),
-  out: svg('<path d="M7 17L17 7M8 7h9v9"/>'),
-  user: svg('<circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>'),
-  nick: svg('<circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/>'),
-  job: svg('<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>'),
-  phone: svg('<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.58 2.81.7A2 2 0 0 1 22 16.92z"/>'),
-  company: svg('<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h.01M15 8h.01M9 12h.01M15 12h.01M10 21v-4h4v4"/>'),
-  pin: svg('<path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>'),
-  mail: svg('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>'),
-  facebook: svg('<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>'),
-  instagram: svg('<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/>'),
-  linkedin: svg('<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>'),
-  wechat: svg('<path d="M9 4C5.4 4 2.5 6.3 2.5 9.2c0 1.6.9 3.1 2.3 4L4.3 15.5l2.4-1.2c.5.1 1 .2 1.5.2"/><path d="M21.5 14.2c0-2.6-2.5-4.7-5.5-4.7s-5.5 2.1-5.5 4.7 2.5 4.7 5.5 4.7c.7 0 1.3-.1 1.9-.3l2 1-.4-2c1.1-.8 2-2 2-3.4z"/>'),
-  whatsapp: svg('<path d="M3 21l1.65-4.9A9 9 0 1 1 8 19.4L3 21z"/><path d="M9 9c0 3.5 3 6.5 6 6l1-1.5-2-1-1 .8c-1-.5-1.8-1.3-2.3-2.3l.8-1-1-2z"/>'),
-  youtube: svg('<path d="M22 12s0-3.2-.4-4.7a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.5a2.5 2.5 0 0 0-1.8 1.8C2 8.8 2 12 2 12s0 3.2.4 4.7a2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.5a2.5 2.5 0 0 0 1.8-1.8C22 15.2 22 12 22 12z"/><path d="m10 9 5 3-5 3z"/>'),
-  telegram: svg('<path d="M22 3L2 11l7 2.5L11.5 21l3-5 5 3.5L22 3z"/><path d="M9 13.5L22 3"/>'),
-  link: svg('<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>')
-};
-document.querySelectorAll('[data-icon]').forEach(el => { el.innerHTML = ICONS[el.dataset.icon]; });
+            <h2 class="text-lg font-bold text-oatmilk-pure mt-3 tracking-tight">OneTap Las Piñas</h2>
+            <p class="text-xs text-titanium-tint font-medium tracking-wide">Smart NFC Networking & Digital Solutions</p>
+            
+            <!-- Location Badge -->
+            <div class="mt-1.5 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-stealth-surface border border-stealth-border text-[11px] text-titanium-light">
+                <i data-lucide="map-pin" class="w-3 h-3 text-titanium-tint"></i>
+                <span>Las Piñas City, Metro Manila</span>
+            </div>
 
-/* ---------- Content ---------- */
-const strip = s => s.replace(/^@/, '');
-const digits = s => s.replace(/[^\d+]/g, '');
-const url = s => /^https?:\/\//i.test(s) ? s : 'https://' + s;
+            <!-- Bio -->
+            <p class="text-xs text-oatmilk/85 leading-relaxed mt-2.5 px-3 font-normal">
+                Connecting professionals and businesses in one tap. Contactless business cards, custom profiles, and automated links.
+            </p>
+        </section>
 
-function row({ icon, label, value, href, action }) {
-  if (!value) { value = '—'; href = undefined; action = undefined; }
-  const tappable = !!(href || action);
-  const el = document.createElement(href ? 'a' : action ? 'button' : 'div');
-  el.className = 'row' + (tappable ? ' tap' : '');
-  if (href) {
-    el.href = href;
-    if (/^https?:/.test(href)) { el.target = '_blank'; el.rel = 'noopener noreferrer'; }
-  }
-  if (action) { el.type = 'button'; el.addEventListener('click', () => action(el)); }
-  el.innerHTML =
-    `<span class="ico">${ICONS[icon]}</span>` +
-    `<span class="txt"><span class="lbl"></span><span class="val"></span></span>` +
-    (tappable ? `<span class="go">${ICONS.out}</span>` : '');
-  el.querySelector('.lbl').textContent = label;
-  el.querySelector('.val').textContent = value;
-  return el;
-}
+        <!-- Primary Action: Save Contact (.vcf) & Share -->
+        <section class="mt-4 grid grid-cols-5 gap-2 relative z-10">
+            <button id="downloadVcardBtn" class="col-span-4 py-3 px-4 rounded-xl bg-oatmilk hover:bg-oatmilk-pure text-stealth-deep font-semibold text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-lg shadow-black/50 transition duration-200 active:scale-[0.98]">
+                <i data-lucide="user-plus" class="w-4 h-4 text-stealth-deep"></i>
+                <span>Save Contact to Phone</span>
+            </button>
+            <button id="shareProfileBtn" title="Share Profile Link" class="col-span-1 rounded-xl glass-panel text-oatmilk hover:text-white flex items-center justify-center transition active:scale-[0.96]">
+                <i data-lucide="share-2" class="w-4 h-4 text-titanium-light group-hover:text-oatmilk"></i>
+            </button>
+        </section>
 
-async function shareOrCopy(el, text) {
-  const val = el.querySelector('.val');
-  try {
-    if (navigator.share) { await navigator.share({ text }); return; }
-    await navigator.clipboard.writeText(text);
-    val.textContent = 'Copied';
-    setTimeout(() => { val.textContent = text; }, 1400);
-  } catch (e) { /* share cancelled or clipboard unavailable */ }
-}
+        <!-- Polished Contact Info Cards -->
+        <section class="mt-4 space-y-2 relative z-10">
+            <div class="flex items-center justify-between px-1">
+                <span class="text-[10px] tracking-widest text-titanium-light uppercase font-semibold">Direct Inquiries</span>
+                <span class="text-[9px] text-titanium-muted font-mono">TAP TO COPY / OPEN</span>
+            </div>
 
-function saveContact() {
-  const escapeVCard = value => String(value || '').replace(/\\/g, '\\\\').replace(/\r?\n/g, '\\n').replace(/,/g, '\\,').replace(/;/g, '\\;');
-  const lines = [
-    'BEGIN:VCARD',
-    'VERSION:3.0',
-    `FN:${escapeVCard(P.name)}`,
-    'N:Onetap;;;;',
-    `ORG:${escapeVCard(P.company)}`,
-    `TITLE:${escapeVCard(P.position)}`,
-    `NOTE:${escapeVCard(P.bio)}`,
-    ...[...new Set([P.contact1Value, P.contact2Value, P.contact3Value].filter(Boolean))].map(value => `TEL;TYPE=CELL:${escapeVCard(value)}`),
-    `EMAIL;TYPE=INTERNET:${escapeVCard(P.email)}`,
-    `EMAIL;TYPE=INTERNET:${escapeVCard(P.email2)}`,
-    `ADR;TYPE=WORK:;;${escapeVCard(P.address)};;;;`,
-    `URL:${escapeVCard(P.social.facebook)}`,
-    `X-SOCIALPROFILE;TYPE=facebook:${escapeVCard(P.social.facebook)}`,
-    `X-SOCIALPROFILE;TYPE=facebook:${escapeVCard(P.social.facebookPage)}`,
-    `X-SOCIALPROFILE;TYPE=linkedin:${escapeVCard(P.social.linkedin)}`,
-    `X-SOCIALPROFILE;TYPE=youtube:${escapeVCard(P.social.Youtube)}`,
-    `X-SOCIALPROFILE;TYPE=whatsapp:https://wa.me/${digits(P.social.whatsapp).replace(/^\+/, '')}`,
-    'END:VCARD'
-  ].filter(line => !line.endsWith(':'));
-  const blob = new Blob([lines.join('\r\n')], { type: 'text/vcard;charset=utf-8' });
-  const downloadUrl = URL.createObjectURL(blob);
-  const download = document.createElement('a');
-  download.href = downloadUrl;
-  download.download = `${(P.nickname || 'contact').replace(/[^a-z0-9-_]+/gi, '-')}.vcf`;
-  download.click();
-  setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
-}
+            <div class="grid grid-cols-1 gap-2">
+                <!-- Phone Direct Action -->
+                <div class="glass-panel p-2.5 px-3 rounded-xl flex items-center justify-between transition-all duration-200">
+                    <a href="tel:+639123456789" class="flex items-center gap-3 flex-1 min-w-0">
+                        <div class="w-8 h-8 rounded-lg bg-stealth-surface border border-stealth-border flex items-center justify-center text-oatmilk shrink-0">
+                            <i data-lucide="phone-call" class="w-4 h-4 text-titanium-tint"></i>
+                        </div>
+                        <div class="text-left truncate">
+                            <span class="block text-[11px] text-titanium-light uppercase font-semibold leading-none">Mobile / Hotline</span>
+                            <span class="block text-xs font-medium text-oatmilk-pure mt-1 truncate">+63 912 345 6789</span>
+                        </div>
+                    </a>
+                    <button class="copy-trigger p-1.5 rounded-lg text-titanium-light hover:text-oatmilk hover:bg-stealth-surface transition" data-copy="+639123456789" title="Copy Phone Number">
+                        <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
 
-const P = PROFILE, S = PROFILE.social;
-document.getElementById('heroName').textContent = P.name;
-document.getElementById('heroHandle').textContent = '@' + strip(P.nickname).toLowerCase().replace(/\s+/g, '');
+                <!-- Email Direct Action -->
+                <div class="glass-panel p-2.5 px-3 rounded-xl flex items-center justify-between transition-all duration-200">
+                    <a href="mailto:onetaplaspinas@gmail.com" class="flex items-center gap-3 flex-1 min-w-0">
+                        <div class="w-8 h-8 rounded-lg bg-stealth-surface border border-stealth-border flex items-center justify-center text-oatmilk shrink-0">
+                            <i data-lucide="mail" class="w-4 h-4 text-titanium-tint"></i>
+                        </div>
+                        <div class="text-left truncate">
+                            <span class="block text-[11px] text-titanium-light uppercase font-semibold leading-none">Email Address</span>
+                            <span class="block text-xs font-medium text-oatmilk-pure mt-1 truncate">onetaplaspinas@gmail.com</span>
+                        </div>
+                    </a>
+                    <button class="copy-trigger p-1.5 rounded-lg text-titanium-light hover:text-oatmilk hover:bg-stealth-surface transition" data-copy="onetaplaspinas@gmail.com" title="Copy Email">
+                        <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
 
-const companyName = P.company || 'University of Perpetual Help';
-document.getElementById('companyStatA').textContent = companyName;
+        <!-- Social Media Grid with Accurate Official SVG Icons -->
+        <section class="mt-4 space-y-2 relative z-10">
+            <span class="text-[10px] tracking-widest text-titanium-light uppercase font-semibold px-1 block">Social Accounts</span>
+            
+            <div class="grid grid-cols-1 gap-2">
+                <!-- WhatsApp -->
+                <a href="https://wa.me/639123456789" target="_blank" rel="noopener noreferrer" class="group glass-panel p-2.5 px-3 rounded-xl flex items-center justify-between transition-all duration-200">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-[#25D366]/15 border border-[#25D366]/30 flex items-center justify-center text-[#25D366] group-hover:scale-105 transition-transform">
+                            <!-- Official WhatsApp Vector Icon -->
+                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                            </svg>
+                        </div>
+                        <div class="text-left">
+                            <span class="block text-xs font-semibold text-oatmilk-pure">WhatsApp</span>
+                            <span class="block text-[11px] text-titanium-light">Chat with OneTap</span>
+                        </div>
+                    </div>
+                    <i data-lucide="arrow-up-right" class="w-4 h-4 text-titanium-light group-hover:text-oatmilk group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200"></i>
+                </a>
 
-document.getElementById('details').append(
-  row({ icon: 'user', label: 'Save contact', value: 'Add to contacts', action: saveContact }),
-  row({ icon: 'user',    label: 'Name',           value: P.name }),
-  row({ icon: 'user',    label: 'Bio',            value: P.bio }),
-  row({ icon: 'company', label: 'Company',        value: P.company }),
-  row({ icon: 'job',     label: 'Position',       value: P.position }),
-  ...[P.contact1Value, P.contact2Value, P.contact3Value].map((value, index) => value ? row({
-    icon: 'phone',
-    label: P['contact' + (index + 1) + 'Label'] || 'Contact ' + (index + 1),
-    value,
-    href: 'tel:' + digits(value)
-  }) : []),
-  row({ icon: 'pin',     label: 'Address',        value: P.address,
-        href: 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(P.address) }),
-  row({ icon: 'mail',    label: 'Gmail',          value: P.email,  href: 'mailto:' + P.email }),
-);
+                <!-- Facebook -->
+                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="group glass-panel p-2.5 px-3 rounded-xl flex items-center justify-between transition-all duration-200">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-[#1877F2]/15 border border-[#1877F2]/30 flex items-center justify-center text-[#1877F2] group-hover:scale-105 transition-transform">
+                            <!-- Official Facebook 'f' Vector Icon -->
+                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
+                        </div>
+                        <div class="text-left">
+                            <span class="block text-xs font-semibold text-oatmilk-pure">Facebook</span>
+                            <span class="block text-[11px] text-titanium-light">OneTap Las Piñas</span>
+                        </div>
+                    </div>
+                    <i data-lucide="arrow-up-right" class="w-4 h-4 text-titanium-light group-hover:text-oatmilk group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200"></i>
+                </a>
 
-const socialEntries = [
-  S.whatsapp ? row({ icon: 'whatsapp', label: 'WhatsApp', value: S.whatsapp, href: 'https://wa.me/' + digits(S.whatsapp).replace(/^\+/, '') }) : null,
-  S.facebook ? row({ icon: 'facebook', label: 'Facebook', value: S.facebook, href: S.facebook }) : null,
-  S.instagram ? row({ icon: 'instagram', label: 'Instagram', value: S.instagram, href: S.instagram }) : null,
-  S.linkedin ? row({ icon: 'linkedin', label: 'LinkedIn', value: S.linkedin, href: S.linkedin }) : null,
-  S.youtube ? row({ icon: 'youtube', label: 'YouTube', value: S.youtube, href: S.youtube }) : null,
-  row({ icon: 'link', label: 'Leave a review', value: 'Facebook page', href: S.facebookPage || S.facebook })
-].filter(Boolean);
+                <!-- Instagram -->
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="group glass-panel p-2.5 px-3 rounded-xl flex items-center justify-between transition-all duration-200">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-[#E4405F]/15 border border-[#E4405F]/30 flex items-center justify-center text-[#E4405F] group-hover:scale-105 transition-transform">
+                            <!-- Official Instagram Vector Icon -->
+                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                            </svg>
+                        </div>
+                        <div class="text-left">
+                            <span class="block text-xs font-semibold text-oatmilk-pure">Instagram</span>
+                            <span class="block text-[11px] text-titanium-light">@onetap.laspinas</span>
+                        </div>
+                    </div>
+                    <i data-lucide="arrow-up-right" class="w-4 h-4 text-titanium-light group-hover:text-oatmilk group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200"></i>
+                </a>
 
-document.getElementById('socials').append(...socialEntries);
+                <!-- TikTok -->
+                <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" class="group glass-panel p-2.5 px-3 rounded-xl flex items-center justify-between transition-all duration-200">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-stealth-surface border border-stealth-border flex items-center justify-center text-oatmilk group-hover:scale-105 transition-transform">
+                            <!-- Official TikTok Vector Icon -->
+                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
+                            </svg>
+                        </div>
+                        <div class="text-left">
+                            <span class="block text-xs font-semibold text-oatmilk-pure">TikTok</span>
+                            <span class="block text-[11px] text-titanium-light">@onetap_lp</span>
+                        </div>
+                    </div>
+                    <i data-lucide="arrow-up-right" class="w-4 h-4 text-titanium-light group-hover:text-oatmilk group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200"></i>
+                </a>
+            </div>
+        </section>
 
-const productImages = [
-  'product/WhatsApp Image 2026-10-11 at 7.30.57 PM.jpeg'
-];
-const productsWrap = document.getElementById('products');
-productImages.forEach((src, index) => {
-  const article = document.createElement('article');
-  article.className = 'product-card';
-  article.innerHTML = `
-    <img src="${src}" alt="Onetap product ${index + 1}">
-    <div class="product-meta">
-      <strong>Onetap product</strong>
-      <span>Premium local service and lifestyle essentials</span>
-    </div>
-  `;
-  productsWrap.appendChild(article);
-});
+        <!-- Footer -->
+        <footer class="mt-6 pt-4 border-t border-stealth-border/70 text-center relative z-10">
+            <p class="text-[10px] text-titanium-tint uppercase tracking-widest font-mono">
+                OneTap Las Piñas Smart NFC
+            </p>
+            <p class="text-[9px] text-titanium-muted mt-0.5">Tap physical card to connect • No application required</p>
+        </footer>
 
-const faqItems = [
-  {
-    image: 'faq/840431903_122121899745472644_986702108616552243_n.jpg',
-    question: 'What is Onetap?',
-    answer: 'Onetap is a lifestyle and business connection brand built to help customers and partners discover simple, reliable solutions for everyday needs.'
-  },
-  {
-    image: 'faq/825286818_122121899739472644_1771896882386086272_n.jpg',
-    question: 'How can I contact Onetap?',
-    answer: 'You can contact us through Facebook, Instagram, WhatsApp, or by calling our available numbers listed in the contact section.'
-  },
-  {
-    image: 'faq/825271622_122122381509472644_2844501410843404043_n.jpg',
-    question: 'Can I leave a review?',
-    answer: 'Yes. You can leave a review on our Facebook page and share your experience with the Onetap community.'
-  }
-];
+        <!-- Toast Alert Notification -->
+        <div id="feedbackToast" class="fixed bottom-6 left-1/2 -translate-x-1/2 max-w-[340px] w-full px-4 z-50">
+            <div class="bg-oatmilk text-stealth-deep px-4 py-2.5 rounded-xl shadow-2xl border border-titanium-muted/30 flex items-center justify-between text-xs font-semibold">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
+                    <span id="toastText">Action completed</span>
+                </div>
+                <button id="dismissToastBtn" class="text-titanium-dark hover:text-stealth-deep">
+                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
+        </div>
 
-const faqWrap = document.getElementById('faq');
-faqItems.forEach(item => {
-  const card = document.createElement('div');
-  card.className = 'faq-item';
-  card.innerHTML = `
-    <img src="${item.image}" alt="${item.question}">
-    <h4 class="faq-question">${item.question}</h4>
-    <p class="faq-answer">${item.answer}</p>
-  `;
-  faqWrap.appendChild(card);
-});
+    </main>
 
-document.getElementById('leaveReview').addEventListener('click', () => {
-  const reviewUrl = S.facebookPage || S.facebook || 'https://www.facebook.com/onetap.nfc.ph';
-  window.open(reviewUrl, '_blank', 'noopener,noreferrer');
-});
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
 
-/* ---------- Follow toggle ---------- */
-const follow = document.getElementById('follow');
-follow.addEventListener('click', () => {
-  const email = (P.email || 'hello@example.com').trim();
-  window.location.href = 'mailto:' + email + '?subject=' + encodeURIComponent('Hello ' + P.name);
-});
-document.querySelectorAll('.topbar .glass').forEach(b => b.addEventListener('click', e => e.preventDefault()));
+        // Elements
+        const cardWrapper = document.getElementById('nfcCardWrapper');
+        const cardInner = document.getElementById('nfcCardInner');
+        const manualFlipBtn = document.getElementById('manualFlipBtn');
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const themeToggleText = document.getElementById('themeToggleText');
+        const cardFront = document.getElementById('cardFront');
+        const cardBack = document.getElementById('cardBack');
+        const downloadVcardBtn = document.getElementById('downloadVcardBtn');
+        const shareProfileBtn = document.getElementById('shareProfileBtn');
+        const copyTriggers = document.querySelectorAll('.copy-trigger');
+        const toast = document.getElementById('feedbackToast');
+        const toastText = document.getElementById('toastText');
+        const dismissToastBtn = document.getElementById('dismissToastBtn');
 
-/* ---------- Scroll-reveal engine ---------- */
-const app = document.getElementById('app');
-const hero = document.getElementById('hero');
-const sheet = document.getElementById('sheet');
-const head = document.getElementById('sheetHead');
-const list = document.getElementById('list');
+        let isFlipped = false;
+        let isWhiteTheme = false;
+        let toastTimer;
 
-let p = 0, open = false;
-const travel = () => app.clientHeight * 0.6;
-const setP = v => { p = Math.max(0, Math.min(1, v)); app.style.setProperty('--p', p); };
+        // 3D Flip
+        function toggleCardFlip() {
+            isFlipped = !isFlipped;
+            cardInner.classList.toggle('flipped', isFlipped);
+        }
 
-function snap(next) {
-  open = next;
-  app.classList.remove('dragging');
-  setP(next ? 1 : 0);
-  sheet.inert = !next;
-  hero.inert = next;
-  sheet.setAttribute('aria-hidden', String(!next));
-  if (!next) list.scrollTop = 0;
-}
+        cardWrapper.addEventListener('click', toggleCardFlip);
+        manualFlipBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleCardFlip();
+        });
 
-/* Pointer drag on the photo card (swipe up) and on the sheet header (swipe down) */
-function attachDrag(el) {
-  let startY = 0, startP = 0, moved = false, id = null, lastY = 0, lastT = 0, vy = 0;
-  el.addEventListener('pointerdown', e => {
-    if (e.pointerType === 'mouse' && e.button !== 0) return;
-    startY = lastY = e.clientY; startP = p; moved = false; id = e.pointerId; lastT = performance.now(); vy = 0;
-  });
-  el.addEventListener('pointermove', e => {
-    if (id !== e.pointerId) return;
-    const dy = startY - e.clientY;
-    if (!moved && Math.abs(dy) > 6) {
-      moved = true;
-      app.classList.add('dragging');
-      try { el.setPointerCapture(id); } catch (_) {}
-    }
-    if (moved) {
-      const now = performance.now();
-      vy = (lastY - e.clientY) / Math.max(1, now - lastT);
-      lastY = e.clientY; lastT = now;
-      setP(startP + dy / travel());
-    }
-  });
-  const end = e => {
-    if (id !== e.pointerId) return;
-    id = null;
-    if (!moved) return;
-    el.addEventListener('click', ev => { ev.stopPropagation(); ev.preventDefault(); }, { capture: true, once: true });
-    snap(vy > 0.4 ? true : vy < -0.4 ? false : p > 0.5);
-  };
-  el.addEventListener('pointerup', end);
-  el.addEventListener('pointercancel', end);
-}
-attachDrag(hero);
-attachDrag(head);
+        // Theme Toggle: Carbon Black vs Carbon White Card
+        themeToggleBtn.addEventListener('click', () => {
+            isWhiteTheme = !isWhiteTheme;
+            
+            if (isWhiteTheme) {
+                themeToggleText.textContent = 'Carbon White';
+                [cardFront, cardBack].forEach(face => {
+                    face.classList.remove('bg-[#101217]', 'text-[#f6f3eb]', 'border-[#2a2d39]');
+                    face.classList.add('bg-[#ede7db]', 'text-[#101217]', 'border-[#dfd7c5]');
+                });
+            } else {
+                themeToggleText.textContent = 'Carbon Black';
+                [cardFront, cardBack].forEach(face => {
+                    face.classList.remove('bg-[#ede7db]', 'text-[#101217]', 'border-[#dfd7c5]');
+                    face.classList.add('bg-[#101217]', 'text-[#f6f3eb]', 'border-[#2a2d39]');
+                });
+            }
+        });
 
-/* Touch: pulling down while the detail list is at the top closes the sheet */
-let ty = 0, pulling = false;
-list.addEventListener('touchstart', e => { ty = e.touches[0].clientY; pulling = false; }, { passive: true });
-list.addEventListener('touchmove', e => {
-  const y = e.touches[0].clientY;
-  if (!pulling && list.scrollTop <= 0 && y - ty > 6) {
-    pulling = true; ty = y; app.classList.add('dragging');
-  }
-  if (pulling) { e.preventDefault(); setP(1 - (y - ty) / travel()); }
-}, { passive: false });
-const endPull = () => { if (pulling) { pulling = false; snap(p > 0.7); } };
-list.addEventListener('touchend', endPull);
-list.addEventListener('touchcancel', endPull);
+        // Toast Feedback System
+        function notify(message) {
+            toastText.textContent = message;
+            toast.classList.add('active');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.remove('active');
+            }, 3000);
+        }
 
-/* Mouse wheel / trackpad */
-let lock = 0, lastWheel = 0;
-app.addEventListener('wheel', e => {
-  const now = Date.now();
-  const newGesture = now - lastWheel > 150;
-  lastWheel = now;
-  if (now < lock) return;
-  if (!open && e.deltaY > 8) { snap(true); lock = now + 600; }
-  else if (open && newGesture && list.scrollTop <= 0 && e.deltaY < -8) { snap(false); lock = now + 600; }
-}, { passive: true });
+        dismissToastBtn.addEventListener('click', () => {
+            toast.classList.remove('active');
+        });
 
-/* Buttons + keyboard */
-document.getElementById('openBtn').addEventListener('click', () => snap(true));
-document.getElementById('closeBtn').addEventListener('click', () => snap(false));
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && open) snap(false);
-  if (e.key === 'ArrowUp' && !open && document.activeElement === document.body) snap(true);
-});
+        // Clipboard Copy Helper
+        function copyToClipboard(text, successMsg) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    notify(successMsg);
+                }).catch(() => {
+                    legacyCopy(text, successMsg);
+                });
+            } else {
+                legacyCopy(text, successMsg);
+            }
+        }
 
-/* Service Worker registration for offline support */
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).catch(error => {
-      console.error('Service worker registration failed:', error);
-    });
-  });
-}
-</script>
+        function legacyCopy(text, successMsg) {
+            const input = document.createElement('input');
+            input.value = text;
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand('copy');
+            document.body.removeChild(input);
+            notify(successMsg);
+        }
+
+        // Copy buttons listener
+        copyTriggers.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const copyValue = btn.getAttribute('data-copy');
+                copyToClipboard(copyValue, `Copied: ${copyValue}`);
+            });
+        });
+
+        // Web Share or Fallback
+        shareProfileBtn.addEventListener('click', async () => {
+            const shareData = {
+                title: 'OneTap Las Piñas',
+                text: 'Connect with OneTap Las Piñas Digital Profile',
+                url: window.location.href
+            };
+
+            if (navigator.share) {
+                try {
+                    await navigator.share(shareData);
+                } catch (err) {
+                    // user cancelled share
+                }
+            } else {
+                copyToClipboard(window.location.href, 'Profile link copied to clipboard!');
+            }
+        });
+
+        // Generate vCard (.vcf)
+        downloadVcardBtn.addEventListener('click', () => {
+            const vCardContent = [
+                'BEGIN:VCARD',
+                'VERSION:3.0',
+                'FN:OneTap Las Piñas',
+                'ORG:OneTap Las Piñas',
+                'TITLE:Smart NFC Networking & Digital Solutions',
+                'TEL;TYPE=CELL,VOICE:+639123456789',
+                'EMAIL;TYPE=PREF,INTERNET:onetaplaspinas@gmail.com',
+                'ADR;TYPE=WORK:;;Las Piñas City;Metro Manila;;Philippines',
+                'NOTE:Contact saved via OneTap NFC Smart Card',
+                'URL:https://facebook.com',
+                'END:VCARD'
+            ].join('\r\n');
+
+            const blob = new Blob([vCardContent], { type: 'text/vcard;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'OneTap_Las_Pinas.vcf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            notify('Contact vCard downloaded!');
+        });
+    </script>
 </body>
 </html>
