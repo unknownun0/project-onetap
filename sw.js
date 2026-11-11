@@ -1,4 +1,4 @@
-const CACHE_NAME = 'profile-card-v5';
+const CACHE_NAME = 'profile-card-v6';
 const CACHE_PREFIX = 'profile-card-';
 const ASSETS = [
   '/',
@@ -6,6 +6,8 @@ const ASSETS = [
   '/manifest.json',
   '/logo.jpg',
   '/profile.jpg',
+  '/front.png',
+  '/back.png',
   '/product/WhatsApp Image 2026-10-11 at 7.30.57 PM.jpeg',
   '/faq/840431903_122121899745472644_986702108616552243_n.jpg',
   '/faq/825286818_122121899739472644_1771896882386086272_n.jpg',
