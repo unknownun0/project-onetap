@@ -1,644 +1,1104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OneTap Las Piñas — Digital Profile & NFC Business Card</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TITOGAB | OneTap Las Piñas</title>
+  
+  <!-- Inter & Syne fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        stealth: {
-                            deep: '#0b0c10',
-                            card: '#13151b',
-                            surface: '#1a1d24',
-                            border: '#262a34'
-                        },
-                        titanium: {
-                            dark: '#2c2f38',
-                            DEFAULT: '#4e5361',
-                            muted: '#717788',
-                            light: '#8f95a5',
-                            tint: '#b8bcc7'
-                        },
-                        oatmilk: {
-                            DEFAULT: '#f6f3eb',
-                            card: '#ede7db',
-                            dark: '#dfd7c5',
-                            pure: '#ffffff'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif']
-                    }
-                }
-            }
-        }
-    </script>
+  <style>
+    :root {
+      --stealth-bg: #0b0c0e;
+      --stealth-surface: #131417;
+      --stealth-surface-2: #1b1d22;
+      --titanium-border: rgba(255, 255, 255, 0.08);
+      --titanium-subtle: #4b4e58;
+      --titanium-muted: #8a8e9b;
+      --oat-white: #f5f2eb;
+      --oat-dim: #cfcbbe;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 22px;
+    }
 
-    <style>
-        body {
-            background-color: #0b0c10;
-            color: #f6f3eb;
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
 
-        /* 3D Perspective Card Container */
-        .card-perspective-container {
-            perspective: 1200px;
-        }
+    body {
+      background-color: var(--stealth-bg);
+      color: var(--oat-white);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 24px 16px 80px;
+      overflow-x: hidden;
+      position: relative;
+    }
 
-        .flip-card-inner {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 1.586 / 1;
-            transition: transform 0.75s cubic-bezier(0.23, 1, 0.32, 1);
-            transform-style: preserve-3d;
-        }
+    body::before {
+      content: "";
+      position: fixed;
+      top: -150px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(245, 242, 235, 0.04) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
 
-        .flip-card-inner.flipped {
-            transform: rotateY(180deg);
-        }
+    .container {
+      width: 100%;
+      max-width: 440px;
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
 
-        .card-face {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            -webkit-backface-visibility: hidden;
-            backface-visibility: hidden;
-            border-radius: 20px;
-            overflow: hidden;
-            user-select: none;
-            box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
-        }
+    /* Top Brand Header */
+    .brand-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 2px;
+    }
 
-        .card-back {
-            transform: rotateY(180deg);
-        }
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: var(--oat-white);
+    }
 
-        /* Concentric Radar Rings mirroring the OneTap Card Vector */
-        .radar-circle {
-            position: absolute;
-            border-radius: 9999px;
-            pointer-events: none;
-            top: 50%;
-            transform: translateY(-50%);
-            border: 1.5px solid currentColor;
-        }
+    .brand-logo svg {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: var(--oat-white);
+      stroke-width: 2.2;
+    }
 
-        .radar-c1 {
-            left: 20%;
-            width: 100px;
-            height: 100px;
-            opacity: 0.16;
-            margin-left: -50px;
-        }
+    .theme-pill {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--titanium-muted);
+      border: 1px solid var(--titanium-border);
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.02);
+    }
 
-        .radar-c2 {
-            left: 20%;
-            width: 220px;
-            height: 220px;
-            opacity: 0.10;
-            margin-left: -110px;
-        }
+    /* ========================================================
+       IMMERSIVE HERO CARD (Reference Style: Text in front of image with bottom gradient)
+       ======================================================== */
+    .profile-hero-card {
+      position: relative;
+      width: 100%;
+      height: 380px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--titanium-border);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.65);
+      background-color: var(--stealth-surface);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
 
-        .radar-c3 {
-            left: 20%;
-            width: 320px;
-            height: 320px;
-            opacity: 0.06;
-            margin-left: -160px;
-        }
+    .profile-hero-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 25%;
+      transition: transform 0.4s ease;
+    }
 
-        /* Gloss / Sheen overlay */
-        .card-specular {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.25) 100%);
-            pointer-events: none;
-        }
+    /* Gradient overlay: crisp top with deep dark fade at the bottom for typography legibility */
+    .profile-hero-gradient {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(11, 12, 14, 0.1) 0%,
+        rgba(11, 12, 14, 0.25) 40%,
+        rgba(11, 12, 14, 0.85) 75%,
+        rgba(11, 12, 14, 0.98) 100%
+      );
+      pointer-events: none;
+      z-index: 2;
+    }
 
-        /* Glassmorphic micro-card */
-        .glass-panel {
-            background: rgba(26, 29, 36, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(78, 83, 97, 0.25);
-        }
+    /* Camera Upload Badge for Background/Profile Photo */
+    .avatar-upload-badge {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 36px;
+      height: 36px;
+      background: rgba(19, 20, 23, 0.8);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--oat-white);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+      z-index: 4;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
 
-        .glass-panel:hover {
-            border-color: rgba(143, 149, 165, 0.45);
-            background: rgba(26, 29, 36, 0.9);
-        }
+    .avatar-upload-badge:hover {
+      transform: scale(1.08);
+      background: rgba(30, 32, 38, 0.95);
+    }
 
-        /* Toast animation */
-        #feedbackToast {
-            transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.25s ease;
-            transform: translate(-50%, 120%);
-            opacity: 0;
-            pointer-events: none;
-        }
+    .avatar-upload-badge svg {
+      width: 17px;
+      height: 17px;
+      stroke: var(--oat-white);
+      fill: none;
+      stroke-width: 2;
+    }
 
-        #feedbackToast.active {
-            transform: translate(-50%, 0);
-            opacity: 1;
-            pointer-events: auto;
-        }
-    </style>
+    /* Content positioned directly on top / in front of image */
+    .profile-hero-content {
+      position: relative;
+      z-index: 3;
+      padding: 22px 20px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .profile-title-block {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .profile-name-tag {
+      font-family: 'Syne', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--oat-white);
+      letter-spacing: -0.8px;
+      line-height: 1.05;
+      text-transform: uppercase;
+      text-shadow: 0 3px 14px rgba(0, 0, 0, 0.8);
+    }
+
+    .profile-role {
+      font-size: 13.5px;
+      color: var(--oat-dim);
+      font-weight: 500;
+      margin-top: 5px;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+    }
+
+    .profile-location {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      color: var(--titanium-muted);
+      margin-top: 6px;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+    }
+
+    .profile-location svg {
+      width: 13px;
+      height: 13px;
+      stroke: var(--titanium-muted);
+      fill: none;
+    }
+
+    /* Actions Group */
+    .actions-group {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .btn-save-contact {
+      flex: 1;
+      background: var(--oat-white);
+      color: var(--stealth-bg);
+      border: none;
+      padding: 13px 18px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 13.5px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: opacity 0.2s ease, transform 0.15s ease;
+      text-decoration: none;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .btn-save-contact:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+
+    .btn-share {
+      background: rgba(27, 29, 34, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: var(--oat-white);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .btn-share:hover {
+      background: #24262d;
+    }
+
+    /* 3D Flip Card Container */
+    .card-scene {
+      perspective: 1200px;
+      width: 100%;
+      aspect-ratio: 1.586 / 1;
+      cursor: pointer;
+    }
+
+    .card-flipper {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.75s cubic-bezier(0.2, 0.85, 0.32, 1.2);
+    }
+
+    .card-flipper.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: var(--radius-lg);
+      padding: 22px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      background-size: cover;
+      background-position: center;
+    }
+
+    /* Card Front */
+    .card-front {
+      background: linear-gradient(135deg, #18191d 0%, #0d0e11 100%);
+    }
+
+    /* Card Back */
+    .card-back {
+      background: linear-gradient(135deg, #15161a 0%, #0a0b0d 100%);
+      transform: rotateY(180deg);
+    }
+
+    /* Radar Concentric Rings on Front */
+    .radar-circles {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .radar-circle {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(245, 242, 235, 0.05);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .radar-circle.c1 { width: 140px; height: 140px; }
+    .radar-circle.c2 { width: 220px; height: 220px; }
+    .radar-circle.c3 { width: 300px; height: 300px; }
+
+    .card-row-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .card-brand {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-brand-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 15px;
+      letter-spacing: -0.2px;
+      color: var(--oat-white);
+    }
+
+    .card-brand-sub {
+      font-size: 8.5px;
+      letter-spacing: 1.5px;
+      color: var(--titanium-muted);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .card-nfc-icon {
+      opacity: 0.75;
+    }
+
+    .card-row-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      position: relative;
+      z-index: 2;
+    }
+
+    .card-user-info h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--oat-white);
+      letter-spacing: -0.1px;
+      font-family: 'Syne', sans-serif;
+    }
+
+    .card-user-info p {
+      font-size: 10px;
+      color: var(--titanium-muted);
+      margin-top: 2px;
+    }
+
+    .card-tag {
+      font-size: 9px;
+      letter-spacing: 1.2px;
+      color: var(--titanium-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    /* Back Card Elements */
+    .qr-scanner-box {
+      position: absolute;
+      right: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 90px;
+      height: 90px;
+      border: 1px dashed rgba(245, 242, 235, 0.25);
+      border-radius: var(--radius-md);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.25);
+    }
+
+    .qr-scanner-box span {
+      font-size: 8px;
+      letter-spacing: 1.5px;
+      color: var(--titanium-muted);
+    }
+
+    .back-action-hint {
+      font-size: 10px;
+      color: var(--titanium-muted);
+      letter-spacing: 0.5px;
+    }
+
+    /* Flip & Customize Controls */
+    .card-controls {
+      display: flex;
+      gap: 8px;
+      margin-top: -10px;
+    }
+
+    .btn-control {
+      flex: 1;
+      padding: 9px 12px;
+      border-radius: var(--radius-sm);
+      background: var(--stealth-surface);
+      border: 1px solid var(--titanium-border);
+      color: var(--oat-dim);
+      font-size: 12px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-control:hover {
+      background: var(--stealth-surface-2);
+      color: var(--oat-white);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    /* Upload Collapsible Drawer */
+    .upload-collapsible {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      padding: 14px;
+      background: var(--stealth-surface);
+      border: 1px solid var(--titanium-border);
+      border-radius: var(--radius-md);
+      font-size: 12px;
+    }
+
+    .upload-collapsible.is-open {
+      display: flex;
+    }
+
+    .upload-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .upload-btn-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 8px;
+      border: 1px dashed var(--titanium-subtle);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      text-align: center;
+      gap: 4px;
+      color: var(--titanium-muted);
+      font-size: 11px;
+      transition: border-color 0.2s;
+    }
+
+    .upload-btn-label:hover {
+      border-color: var(--oat-white);
+      color: var(--oat-white);
+    }
+
+    /* Contact Details Section */
+    .section-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--titanium-muted);
+      font-weight: 600;
+      margin-bottom: 10px;
+      padding-left: 2px;
+    }
+
+    .contact-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: var(--stealth-surface);
+      border: 1px solid var(--titanium-border);
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .contact-item:hover {
+      border-color: rgba(255, 255, 255, 0.16);
+      background: var(--stealth-surface-2);
+    }
+
+    .contact-item-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .contact-icon-box {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      background: var(--stealth-surface-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .contact-icon-box svg {
+      width: 17px;
+      height: 17px;
+      stroke: var(--oat-white);
+      fill: none;
+      stroke-width: 1.8;
+    }
+
+    .contact-text-title {
+      font-size: 11px;
+      color: var(--titanium-muted);
+      display: block;
+    }
+
+    .contact-text-value {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--oat-white);
+      display: block;
+      margin-top: 1px;
+    }
+
+    .copy-pill-btn {
+      background: transparent;
+      border: none;
+      color: var(--titanium-muted);
+      font-size: 11px;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      transition: color 0.15s;
+    }
+
+    .copy-pill-btn:hover {
+      color: var(--oat-white);
+    }
+
+    /* Social Media Grid */
+    .social-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .social-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 16px 8px;
+      background: var(--stealth-surface);
+      border: 1px solid var(--titanium-border);
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      color: var(--oat-white);
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .social-btn:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.18);
+      background: var(--stealth-surface-2);
+    }
+
+    .social-btn svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+    }
+
+    .social-btn span {
+      font-size: 11px;
+      color: var(--titanium-muted);
+      font-weight: 500;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(70px);
+      background: var(--oat-white);
+      color: var(--stealth-bg);
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: 999px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+      z-index: 100;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+  </style>
 </head>
-<body class="min-h-screen py-4 px-3 sm:px-6 flex items-center justify-center selection:bg-titanium selection:text-oatmilk-pure">
+<body>
 
-    <!-- Mobile-First Container -->
-    <main class="w-full max-w-[425px] bg-stealth-card border border-stealth-border rounded-[36px] shadow-2xl p-5 sm:p-6 relative overflow-hidden my-auto flex flex-col">
-        
-        <!-- Ambient Background Lights -->
-        <div class="absolute -top-20 -left-20 w-52 h-52 bg-titanium-dark/30 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="absolute top-1/3 -right-24 w-52 h-52 bg-titanium/15 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="absolute bottom-10 left-10 w-44 h-44 bg-oatmilk-dark/5 rounded-full blur-2xl pointer-events-none"></div>
+  <div class="container">
+    
+    <!-- Top Header -->
+    <header class="brand-header">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9"/>
+          <circle cx="12" cy="12" r="3" fill="currentColor"/>
+        </svg>
+        <span>OneTap</span>
+      </div>
+      <span class="theme-pill">NFC Profile</span>
+    </header>
 
-        <!-- App Bar / Top Navigation -->
-        <header class="flex items-center justify-between pb-3.5 border-b border-stealth-border/80 relative z-10">
-            <div class="flex items-center gap-2.5">
-                <!-- OneTap Target Symbol -->
-                <div class="w-7 h-7 rounded-full bg-stealth-surface border border-titanium-dark flex items-center justify-center">
-                    <div class="w-3.5 h-3.5 rounded-full border border-oatmilk flex items-center justify-center">
-                        <div class="w-1.5 h-1.5 rounded-full bg-oatmilk"></div>
-                    </div>
-                </div>
-                <div>
-                    <h1 class="text-xs font-bold tracking-wider text-oatmilk uppercase leading-none">OneTap</h1>
-                    <span class="text-[9px] text-titanium-light font-mono tracking-widest uppercase">Las Piñas</span>
-                </div>
-            </div>
+    <!-- IMMERSIVE HERO CARD (Reference Style: Full image with bottom gradient overlay & text in front) -->
+    <section class="profile-hero-card">
+      <!-- Background Profile Image -->
+      <img 
+        src="profile.jpg" 
+        alt="TITOGAB Profile" 
+        id="avatarImage" 
+        class="profile-hero-bg" 
+        onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'600\' height=\'600\' fill=\'%231a1d24\' viewBox=\'0 0 24 24\'><rect width=\'24\' height=\'24\' fill=\'%23131417\'/><circle cx=\'12\' cy=\'9\' r=\'4\' fill=\'%23383a42\'/><path d=\'M4 20c0-4 4-6 8-6s8 2 8 6\' fill=\'%23383a42\'/></svg>'" 
+      />
 
-            <!-- Card Theme Switcher -->
-            <button id="themeToggleBtn" type="button" class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-stealth-surface border border-stealth-border text-[11px] font-medium text-titanium-tint hover:text-oatmilk hover:border-titanium-light transition">
-                <i data-lucide="layers" class="w-3 h-3"></i>
-                <span id="themeToggleText">Carbon Black</span>
-            </button>
-        </header>
+      <!-- Dark Vignette Gradient Overlay -->
+      <div class="profile-hero-gradient"></div>
 
-        <!-- 3D Interactive Card Section -->
-        <section class="mt-4 mb-3 relative z-10">
-            <div class="flex items-center justify-between text-[11px] text-titanium-light px-1 mb-2 font-mono">
-                <span class="flex items-center gap-1.5">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-                    <span>NFC CONNECT</span>
-                </span>
-                <span class="opacity-75 tracking-wider">TAP CARD TO FLIP</span>
-            </div>
+      <!-- Change Profile Picture Floating Action Button -->
+      <label class="avatar-upload-badge" title="Palitan ang Profile Picture">
+        <svg viewBox="0 0 24 24">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </svg>
+        <input type="file" accept="image/*" onchange="uploadProfilePhoto(event)" />
+      </label>
 
-            <div class="card-perspective-container cursor-pointer select-none" id="nfcCardWrapper" role="button" aria-label="Toggle front and back card view">
-                <div class="flip-card-inner" id="nfcCardInner">
-                    
-                    <!-- ========== CARD FRONT ========== -->
-                    <div id="cardFront" class="card-face bg-[#101217] text-[#f6f3eb] border border-[#2a2d39] p-5 flex flex-col justify-between transition-colors duration-300">
-                        <!-- Concentric Vectors -->
-                        <div class="radar-circle radar-c1"></div>
-                        <div class="radar-circle radar-c2"></div>
-                        <div class="radar-circle radar-c3"></div>
-                        <div class="card-specular"></div>
-
-                        <!-- Card Header -->
-                        <div class="flex items-start justify-between relative z-10">
-                            <div class="flex items-center gap-2">
-                                <div class="w-5 h-5 rounded-full border border-current flex items-center justify-center">
-                                    <div class="w-1.5 h-1.5 rounded-full bg-current"></div>
-                                </div>
-                                <div>
-                                    <h3 class="text-xs font-extrabold tracking-wider leading-none">OneTapLasPiñas</h3>
-                                    <p class="text-[7.5px] tracking-[0.22em] opacity-70 mt-0.5 font-mono">NFC SMART CARD</p>
-                                </div>
-                            </div>
-
-                            <!-- Contactless Waves -->
-                            <div class="flex flex-col items-end">
-                                <i data-lucide="wifi" class="w-4 h-4 rotate-90 opacity-90"></i>
-                                <span class="text-[7px] tracking-widest font-mono uppercase mt-1 opacity-60">Tap To Connect</span>
-                            </div>
-                        </div>
-
-                        <!-- Card Footer -->
-                        <div class="relative z-10 flex items-end justify-between pt-4">
-                            <div>
-                                <span class="text-[8px] uppercase tracking-widest text-titanium-light font-mono block">Digital Identity</span>
-                                <span class="text-sm font-semibold tracking-wide text-oatmilk-pure mt-0.5 block">Official Business Card</span>
-                            </div>
-                            <div class="text-right">
-                                <span class="text-[9px] font-mono tracking-widest px-2 py-0.5 rounded border border-current/20 opacity-80">LP • 2026</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ========== CARD BACK ========== -->
-                    <div id="cardBack" class="card-face card-back bg-[#101217] text-[#f6f3eb] border border-[#2a2d39] p-5 flex items-center justify-between transition-colors duration-300">
-                        <div class="radar-circle radar-c1"></div>
-                        <div class="radar-circle radar-c2"></div>
-                        <div class="radar-circle radar-c3"></div>
-                        <div class="card-specular"></div>
-
-                        <!-- Left Info of Back Face -->
-                        <div class="relative z-10 h-full flex flex-col justify-between max-w-[50%]">
-                            <div class="flex items-center gap-1.5">
-                                <div class="w-4 h-4 rounded-full border border-current flex items-center justify-center">
-                                    <div class="w-1 h-1 rounded-full bg-current"></div>
-                                </div>
-                                <span class="text-[10px] font-bold tracking-wider">OneTap LP</span>
-                            </div>
-
-                            <div class="my-auto py-1">
-                                <p class="text-[9px] font-medium opacity-85 leading-tight">Instant networking via NFC & Dynamic QR.</p>
-                                <p class="text-[7.5px] font-mono opacity-60 mt-1 uppercase tracking-wider">No app needed</p>
-                            </div>
-
-                            <p class="text-[8px] font-mono tracking-wider opacity-60">onetap.lp/connect</p>
-                        </div>
-
-                        <!-- Right QR Frame of Back Face -->
-                        <div class="relative z-10 flex flex-col items-center justify-center pl-2">
-                            <div class="w-24 h-24 p-2 rounded-xl bg-white shadow-md flex flex-col items-center justify-center">
-                                <!-- Clean Vector QR Code -->
-                                <svg class="w-full h-full text-black" viewBox="0 0 100 100" fill="currentColor">
-                                    <rect x="6" y="6" width="28" height="28" rx="4" fill="none" stroke="black" stroke-width="6"/>
-                                    <rect x="14" y="14" width="12" height="12"/>
-                                    <rect x="66" y="6" width="28" height="28" rx="4" fill="none" stroke="black" stroke-width="6"/>
-                                    <rect x="74" y="14" width="12" height="12"/>
-                                    <rect x="6" y="66" width="28" height="28" rx="4" fill="none" stroke="black" stroke-width="6"/>
-                                    <rect x="14" y="74" width="12" height="12"/>
-                                    <!-- QR matrix dots -->
-                                    <rect x="44" y="10" width="8" height="8"/>
-                                    <rect x="44" y="26" width="8" height="18"/>
-                                    <rect x="10" y="44" width="18" height="8"/>
-                                    <rect x="74" y="44" width="18" height="8"/>
-                                    <rect x="44" y="44" width="12" height="12"/>
-                                    <rect x="44" y="66" width="8" height="24"/>
-                                    <rect x="64" y="64" width="10" height="10"/>
-                                    <rect x="80" y="76" width="10" height="14"/>
-                                    <rect x="64" y="80" width="10" height="10"/>
-                                </svg>
-                            </div>
-                            <span class="text-[8px] font-mono tracking-[0.25em] opacity-70 mt-1.5 uppercase">SCAN ME</span>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-            <!-- Flip Action Button -->
-            <div class="flex justify-center mt-2.5">
-                <button id="manualFlipBtn" class="text-[11px] text-titanium-light hover:text-oatmilk inline-flex items-center gap-1.5 py-1 px-3 rounded-full hover:bg-stealth-surface transition">
-                    <i data-lucide="refresh-cw" class="w-3 h-3"></i>
-                    <span>Flip Card Preview</span>
-                </button>
-            </div>
-        </section>
-
-        <!-- Profile Section -->
-        <section class="text-center mt-2 relative z-10 flex flex-col items-center">
-            <!-- Profile Avatar with subtle glow ring -->
-            <div class="relative w-20 h-20 rounded-full p-[2.5px] bg-gradient-to-tr from-titanium-dark via-titanium to-oatmilk shadow-xl">
-                <div class="w-full h-full rounded-full overflow-hidden bg-stealth-surface flex items-center justify-center">
-                    <img 
-                        src="project-onetap/profile.jpg" 
-                        alt="Profile avatar" 
-                        class="w-full h-full object-cover"
-                        onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';"
-                    />
-                </div>
-                <!-- Verified Badge -->
-                <div class="absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full bg-stealth-card p-0.5 flex items-center justify-center">
-                    <div class="w-full h-full rounded-full bg-oatmilk text-stealth-deep flex items-center justify-center">
-                        <i data-lucide="check" class="w-3 h-3 stroke-[3.5]"></i>
-                    </div>
-                </div>
-            </div>
-
-            <h2 class="text-lg font-bold text-oatmilk-pure mt-3 tracking-tight">OneTap Las Piñas</h2>
-            <p class="text-xs text-titanium-tint font-medium tracking-wide">Smart NFC Networking & Digital Solutions</p>
-            
-            <!-- Location Badge -->
-            <div class="mt-1.5 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-stealth-surface border border-stealth-border text-[11px] text-titanium-light">
-                <i data-lucide="map-pin" class="w-3 h-3 text-titanium-tint"></i>
-                <span>Las Piñas City, Metro Manila</span>
-            </div>
-
-            <!-- Bio -->
-            <p class="text-xs text-oatmilk/85 leading-relaxed mt-2.5 px-3 font-normal">
-                Connecting professionals and businesses in one tap. Contactless business cards, custom profiles, and automated links.
-            </p>
-        </section>
-
-        <!-- Primary Action: Save Contact (.vcf) & Share -->
-        <section class="mt-4 grid grid-cols-5 gap-2 relative z-10">
-            <button id="downloadVcardBtn" class="col-span-4 py-3 px-4 rounded-xl bg-oatmilk hover:bg-oatmilk-pure text-stealth-deep font-semibold text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-lg shadow-black/50 transition duration-200 active:scale-[0.98]">
-                <i data-lucide="user-plus" class="w-4 h-4 text-stealth-deep"></i>
-                <span>Save Contact to Phone</span>
-            </button>
-            <button id="shareProfileBtn" title="Share Profile Link" class="col-span-1 rounded-xl glass-panel text-oatmilk hover:text-white flex items-center justify-center transition active:scale-[0.96]">
-                <i data-lucide="share-2" class="w-4 h-4 text-titanium-light group-hover:text-oatmilk"></i>
-            </button>
-        </section>
-
-        <!-- Polished Contact Info Cards -->
-        <section class="mt-4 space-y-2 relative z-10">
-            <div class="flex items-center justify-between px-1">
-                <span class="text-[10px] tracking-widest text-titanium-light uppercase font-semibold">Direct Inquiries</span>
-                <span class="text-[9px] text-titanium-muted font-mono">TAP TO COPY / OPEN</span>
-            </div>
-
-            <div class="grid grid-cols-1 gap-2">
-                <!-- Phone Direct Action -->
-                <div class="glass-panel p-2.5 px-3 rounded-xl flex items-center justify-between transition-all duration-200">
-                    <a href="tel:+639123456789" class="flex items-center gap-3 flex-1 min-w-0">
-                        <div class="w-8 h-8 rounded-lg bg-stealth-surface border border-stealth-border flex items-center justify-center text-oatmilk shrink-0">
-                            <i data-lucide="phone-call" class="w-4 h-4 text-titanium-tint"></i>
-                        </div>
-                        <div class="text-left truncate">
-                            <span class="block text-[11px] text-titanium-light uppercase font-semibold leading-none">Mobile / Hotline</span>
-                            <span class="block text-xs font-medium text-oatmilk-pure mt-1 truncate">+63 912 345 6789</span>
-                        </div>
-                    </a>
-                    <button class="copy-trigger p-1.5 rounded-lg text-titanium-light hover:text-oatmilk hover:bg-stealth-surface transition" data-copy="+639123456789" title="Copy Phone Number">
-                        <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-                    </button>
-                </div>
-
-                <!-- Email Direct Action -->
-                <div class="glass-panel p-2.5 px-3 rounded-xl flex items-center justify-between transition-all duration-200">
-                    <a href="mailto:onetaplaspinas@gmail.com" class="flex items-center gap-3 flex-1 min-w-0">
-                        <div class="w-8 h-8 rounded-lg bg-stealth-surface border border-stealth-border flex items-center justify-center text-oatmilk shrink-0">
-                            <i data-lucide="mail" class="w-4 h-4 text-titanium-tint"></i>
-                        </div>
-                        <div class="text-left truncate">
-                            <span class="block text-[11px] text-titanium-light uppercase font-semibold leading-none">Email Address</span>
-                            <span class="block text-xs font-medium text-oatmilk-pure mt-1 truncate">onetaplaspinas@gmail.com</span>
-                        </div>
-                    </a>
-                    <button class="copy-trigger p-1.5 rounded-lg text-titanium-light hover:text-oatmilk hover:bg-stealth-surface transition" data-copy="onetaplaspinas@gmail.com" title="Copy Email">
-                        <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Social Media Grid with Accurate Official SVG Icons -->
-        <section class="mt-4 space-y-2 relative z-10">
-            <span class="text-[10px] tracking-widest text-titanium-light uppercase font-semibold px-1 block">Social Accounts</span>
-            
-            <div class="grid grid-cols-1 gap-2">
-                <!-- WhatsApp -->
-                <a href="https://wa.me/639123456789" target="_blank" rel="noopener noreferrer" class="group glass-panel p-2.5 px-3 rounded-xl flex items-center justify-between transition-all duration-200">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-[#25D366]/15 border border-[#25D366]/30 flex items-center justify-center text-[#25D366] group-hover:scale-105 transition-transform">
-                            <!-- Official WhatsApp Vector Icon -->
-                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
-                            </svg>
-                        </div>
-                        <div class="text-left">
-                            <span class="block text-xs font-semibold text-oatmilk-pure">WhatsApp</span>
-                            <span class="block text-[11px] text-titanium-light">Chat with OneTap</span>
-                        </div>
-                    </div>
-                    <i data-lucide="arrow-up-right" class="w-4 h-4 text-titanium-light group-hover:text-oatmilk group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200"></i>
-                </a>
-
-                <!-- Facebook -->
-                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="group glass-panel p-2.5 px-3 rounded-xl flex items-center justify-between transition-all duration-200">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-[#1877F2]/15 border border-[#1877F2]/30 flex items-center justify-center text-[#1877F2] group-hover:scale-105 transition-transform">
-                            <!-- Official Facebook 'f' Vector Icon -->
-                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                            </svg>
-                        </div>
-                        <div class="text-left">
-                            <span class="block text-xs font-semibold text-oatmilk-pure">Facebook</span>
-                            <span class="block text-[11px] text-titanium-light">OneTap Las Piñas</span>
-                        </div>
-                    </div>
-                    <i data-lucide="arrow-up-right" class="w-4 h-4 text-titanium-light group-hover:text-oatmilk group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200"></i>
-                </a>
-
-                <!-- Instagram -->
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="group glass-panel p-2.5 px-3 rounded-xl flex items-center justify-between transition-all duration-200">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-[#E4405F]/15 border border-[#E4405F]/30 flex items-center justify-center text-[#E4405F] group-hover:scale-105 transition-transform">
-                            <!-- Official Instagram Vector Icon -->
-                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                            </svg>
-                        </div>
-                        <div class="text-left">
-                            <span class="block text-xs font-semibold text-oatmilk-pure">Instagram</span>
-                            <span class="block text-[11px] text-titanium-light">@onetap.laspinas</span>
-                        </div>
-                    </div>
-                    <i data-lucide="arrow-up-right" class="w-4 h-4 text-titanium-light group-hover:text-oatmilk group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200"></i>
-                </a>
-
-                <!-- TikTok -->
-                <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" class="group glass-panel p-2.5 px-3 rounded-xl flex items-center justify-between transition-all duration-200">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-stealth-surface border border-stealth-border flex items-center justify-center text-oatmilk group-hover:scale-105 transition-transform">
-                            <!-- Official TikTok Vector Icon -->
-                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                                <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
-                            </svg>
-                        </div>
-                        <div class="text-left">
-                            <span class="block text-xs font-semibold text-oatmilk-pure">TikTok</span>
-                            <span class="block text-[11px] text-titanium-light">@onetap_lp</span>
-                        </div>
-                    </div>
-                    <i data-lucide="arrow-up-right" class="w-4 h-4 text-titanium-light group-hover:text-oatmilk group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200"></i>
-                </a>
-            </div>
-        </section>
-
-        <!-- Footer -->
-        <footer class="mt-6 pt-4 border-t border-stealth-border/70 text-center relative z-10">
-            <p class="text-[10px] text-titanium-tint uppercase tracking-widest font-mono">
-                OneTap Las Piñas Smart NFC
-            </p>
-            <p class="text-[9px] text-titanium-muted mt-0.5">Tap physical card to connect • No application required</p>
-        </footer>
-
-        <!-- Toast Alert Notification -->
-        <div id="feedbackToast" class="fixed bottom-6 left-1/2 -translate-x-1/2 max-w-[340px] w-full px-4 z-50">
-            <div class="bg-oatmilk text-stealth-deep px-4 py-2.5 rounded-xl shadow-2xl border border-titanium-muted/30 flex items-center justify-between text-xs font-semibold">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
-                    <span id="toastText">Action completed</span>
-                </div>
-                <button id="dismissToastBtn" class="text-titanium-dark hover:text-stealth-deep">
-                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
-                </button>
-            </div>
+      <!-- Content Sitting Directly in front of the image gradient -->
+      <div class="profile-hero-content">
+        <div class="profile-title-block">
+          <h1 class="profile-name-tag">TITOGAB</h1>
+          <p class="profile-role">Co-Founder &amp; Managing Director</p>
+          <div class="profile-location">
+            <svg viewBox="0 0 24 24" stroke-width="2">
+              <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            <span>Las Piñas City, Metro Manila</span>
+          </div>
         </div>
 
-    </main>
+        <!-- Action Buttons -->
+        <div class="actions-group">
+          <button class="btn-save-contact" onclick="saveContactSmart()">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+              <line x1="19" y1="8" x2="19" y2="14"/>
+              <line x1="22" y1="11" x2="16" y2="11"/>
+            </svg>
+            Save Contact
+          </button>
 
-    <script>
-        // Initialize Icons
-        lucide.createIcons();
+          <button class="btn-share" onclick="shareProfile()" title="Share Profile">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="18" cy="5" r="3"/>
+              <circle cx="6" cy="12" r="3"/>
+              <circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
 
-        // Elements
-        const cardWrapper = document.getElementById('nfcCardWrapper');
-        const cardInner = document.getElementById('nfcCardInner');
-        const manualFlipBtn = document.getElementById('manualFlipBtn');
-        const themeToggleBtn = document.getElementById('themeToggleBtn');
-        const themeToggleText = document.getElementById('themeToggleText');
-        const cardFront = document.getElementById('cardFront');
-        const cardBack = document.getElementById('cardBack');
-        const downloadVcardBtn = document.getElementById('downloadVcardBtn');
-        const shareProfileBtn = document.getElementById('shareProfileBtn');
-        const copyTriggers = document.querySelectorAll('.copy-trigger');
-        const toast = document.getElementById('feedbackToast');
-        const toastText = document.getElementById('toastText');
-        const dismissToastBtn = document.getElementById('dismissToastBtn');
+    <!-- 3D Flipping Card Section -->
+    <div class="card-scene" onclick="toggleCardFlip()" title="Click to flip the card">
+      <div class="card-flipper" id="cardFlipper">
+        
+        <!-- FRONT FACE -->
+        <div class="card-face card-front" id="cardFrontFace">
+          <div class="radar-circles">
+            <div class="radar-circle c1"></div>
+            <div class="radar-circle c2"></div>
+            <div class="radar-circle c3"></div>
+          </div>
+          
+          <div class="card-row-top">
+            <div class="card-brand">
+              <span class="card-brand-title">OneTapLasPiñas</span>
+              <span class="card-brand-sub">NFC SMART CARD</span>
+            </div>
+            <div class="card-nfc-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="M8.5 16.5a5 5 0 0 1 0-9"/>
+                <path d="M12 19a8.5 8.5 0 0 0 0-14"/>
+                <path d="M15.5 21.5a12 12 0 0 0 0-19"/>
+              </svg>
+            </div>
+          </div>
 
-        let isFlipped = false;
-        let isWhiteTheme = false;
-        let toastTimer;
+          <div class="card-row-bottom">
+            <div class="card-user-info">
+              <h4 id="cardDisplayName">TITOGAB</h4>
+              <p>TAP TO CONNECT</p>
+            </div>
+            <span class="card-tag">STEALTH</span>
+          </div>
+        </div>
 
-        // 3D Flip
-        function toggleCardFlip() {
-            isFlipped = !isFlipped;
-            cardInner.classList.toggle('flipped', isFlipped);
+        <!-- BACK FACE -->
+        <div class="card-face card-back" id="cardBackFace">
+          <div class="card-row-top">
+            <div class="card-brand">
+              <span class="card-brand-title">OneTapLasPiñas</span>
+              <span class="card-brand-sub">NFC SMART CARD</span>
+            </div>
+          </div>
+
+          <!-- Dynamic QR Frame -->
+          <div class="qr-scanner-box">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--oat-white)" stroke-width="1.8">
+              <rect x="3" y="3" width="7" height="7"/>
+              <rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/>
+              <rect x="3" y="14" width="7" height="7"/>
+            </svg>
+            <span>[ QR ]</span>
+          </div>
+
+          <div class="card-row-bottom">
+            <span class="back-action-hint">SCAN ME</span>
+            <span class="card-tag">BACK</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Controls for 3D Card & Custom Artwork -->
+    <div class="card-controls">
+      <button class="btn-control" onclick="toggleCardFlip()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+        </svg>
+        Flip Card
+      </button>
+      <button class="btn-control" onclick="toggleUploadDrawer()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 3v14M5 10l7-7 7 7M2 21h20"/>
+        </svg>
+        Customize Card
+      </button>
+    </div>
+
+    <!-- Upload Drawer for Custom Card Skins -->
+    <div class="upload-collapsible" id="uploadDrawer">
+      <div class="upload-grid">
+        <label class="upload-btn-label">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
+          </svg>
+          Upload Front Face
+          <input type="file" accept="image/*" onchange="uploadCardFace(event, 'front')" />
+        </label>
+        <label class="upload-btn-label">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
+          </svg>
+          Upload Back Face
+          <input type="file" accept="image/*" onchange="uploadCardFace(event, 'back')" />
+        </label>
+      </div>
+      <button class="btn-control" style="width: 100%; font-size: 11px;" onclick="resetCardStyles()">
+        Reset Card to Default Stealth
+      </button>
+    </div>
+
+    <!-- Contact Information Section -->
+    <section>
+      <div class="section-title">Contact Information</div>
+      <div class="contact-list">
+        
+        <!-- Phone -->
+        <div class="contact-item">
+          <a href="tel:+639123456789" class="contact-item-left" style="text-decoration:none; color:inherit; flex:1;">
+            <div class="contact-icon-box">
+              <svg viewBox="0 0 24 24">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+              </svg>
+            </div>
+            <div>
+              <span class="contact-text-title">Mobile Phone</span>
+              <span class="contact-text-value">+63 912 345 6789</span>
+            </div>
+          </a>
+          <button class="copy-pill-btn" onclick="copyText('+639123456789', 'Phone number copied!')" title="Copy">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Email -->
+        <div class="contact-item">
+          <a href="mailto:contact@onetap.ph" class="contact-item-left" style="text-decoration:none; color:inherit; flex:1;">
+            <div class="contact-icon-box">
+              <svg viewBox="0 0 24 24">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+            </div>
+            <div>
+              <span class="contact-text-title">Email Address</span>
+              <span class="contact-text-value">contact@onetap.ph</span>
+            </div>
+          </a>
+          <button class="copy-pill-btn" onclick="copyText('contact@onetap.ph', 'Email copied!')" title="Copy">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Social Media Section (Official Glyphs) -->
+    <section>
+      <div class="section-title">Connect &amp; Socials</div>
+      <div class="social-grid">
+        
+        <!-- WhatsApp -->
+        <a href="https://wa.me/639123456789" target="_blank" rel="noopener noreferrer" class="social-btn">
+          <svg viewBox="0 0 24 24">
+            <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 14.99 3.81 13.47 3.81 11.91C3.81 7.37 7.5 3.67 12.05 3.67M9.53 7.33C9.35 7.33 9.05 7.4 8.8 7.67C8.55 7.95 7.85 8.6 7.85 9.92C7.85 11.24 8.81 12.51 8.94 12.69C9.08 12.87 10.82 15.54 13.5 16.69C14.13 16.97 14.63 17.13 15.01 17.26C15.65 17.46 16.23 17.43 16.69 17.36C17.2 17.29 18.27 16.71 18.5 16.07C18.72 15.42 18.72 14.87 18.66 14.76C18.59 14.65 18.43 14.58 18.17 14.46C17.92 14.33 16.69 13.73 16.46 13.64C16.23 13.55 16.07 13.51 15.9 13.76C15.73 14.01 15.25 14.58 15.1 14.76C14.95 14.93 14.8 14.96 14.55 14.83C14.29 14.71 13.48 14.44 12.51 13.58C11.76 12.91 11.25 12.08 11.1 11.83C10.95 11.58 11.08 11.44 11.21 11.31C11.33 11.2 11.47 11.01 11.6 10.86C11.73 10.71 11.78 10.6 11.86 10.43C11.95 10.27 11.9 10.12 11.84 10C11.78 9.87 11.3 8.69 11.09 8.21C10.89 7.74 10.69 7.8 10.54 7.8L10.08 7.79C9.9 7.79 9.68 7.79 9.53 7.33Z"/>
+          </svg>
+          <span>WhatsApp</span>
+        </a>
+
+        <!-- Facebook -->
+        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="social-btn">
+          <svg viewBox="0 0 24 24">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+          <span>Facebook</span>
+        </a>
+
+        <!-- Instagram -->
+        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="social-btn">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+          </svg>
+          <span>Instagram</span>
+        </a>
+
+        <!-- TikTok -->
+        <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" class="social-btn">
+          <svg viewBox="0 0 24 24">
+            <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
+          </svg>
+          <span>TikTok</span>
+        </a>
+
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">Copied to clipboard</div>
+
+  <script>
+    // 3D Card Flip Action
+    function toggleCardFlip() {
+      const flipper = document.getElementById('cardFlipper');
+      flipper.classList.toggle('is-flipped');
+    }
+
+    // Toggle Card Upload Drawer
+    function toggleUploadDrawer() {
+      const drawer = document.getElementById('uploadDrawer');
+      drawer.classList.toggle('is-open');
+    }
+
+    // Real-time Card Image Upload (Front & Back)
+    function uploadCardFace(event, face) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        if (face === 'front') {
+          const frontEl = document.getElementById('cardFrontFace');
+          frontEl.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.75)), url('${e.target.result}')`;
+          showToast('Updated Card Front Face!');
+        } else {
+          const backEl = document.getElementById('cardBackFace');
+          backEl.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.75)), url('${e.target.result}')`;
+          showToast('Updated Card Back Face!');
         }
+      };
+      reader.readAsDataURL(file);
+    }
 
-        cardWrapper.addEventListener('click', toggleCardFlip);
-        manualFlipBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleCardFlip();
-        });
+    // Reset Card to Default Stealth Style
+    function resetCardStyles() {
+      const frontEl = document.getElementById('cardFrontFace');
+      const backEl = document.getElementById('cardBackFace');
+      frontEl.style.backgroundImage = '';
+      backEl.style.backgroundImage = '';
+      showToast('Card restored to default Stealth style');
+    }
 
-        // Theme Toggle: Carbon Black vs Carbon White Card
-        themeToggleBtn.addEventListener('click', () => {
-            isWhiteTheme = !isWhiteTheme;
-            
-            if (isWhiteTheme) {
-                themeToggleText.textContent = 'Carbon White';
-                [cardFront, cardBack].forEach(face => {
-                    face.classList.remove('bg-[#101217]', 'text-[#f6f3eb]', 'border-[#2a2d39]');
-                    face.classList.add('bg-[#ede7db]', 'text-[#101217]', 'border-[#dfd7c5]');
-                });
-            } else {
-                themeToggleText.textContent = 'Carbon Black';
-                [cardFront, cardBack].forEach(face => {
-                    face.classList.remove('bg-[#ede7db]', 'text-[#101217]', 'border-[#dfd7c5]');
-                    face.classList.add('bg-[#101217]', 'text-[#f6f3eb]', 'border-[#2a2d39]');
-                });
-            }
-        });
+    // Real-time Profile Photo Upload
+    function uploadProfilePhoto(event) {
+      const file = event.target.files[0];
+      if (!file) return;
 
-        // Toast Feedback System
-        function notify(message) {
-            toastText.textContent = message;
-            toast.classList.add('active');
-            clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => {
-                toast.classList.remove('active');
-            }, 3000);
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('avatarImage').src = e.target.result;
+        showToast('Profile photo updated!');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Direct vCard Save for Android & iOS (Named TITOGAB)
+    async function saveContactSmart() {
+      const vcardText = [
+        'BEGIN:VCARD',
+        'VERSION:3.0',
+        'N:;TITOGAB;;;',
+        'FN:TITOGAB',
+        'ORG:OneTap Las Piñas',
+        'TITLE:Co-Founder & Managing Director',
+        'TEL;TYPE=CELL,VOICE:+639123456789',
+        'EMAIL;TYPE=WORK,INTERNET:contact@onetap.ph',
+        'URL:https://onetap.ph',
+        'ADR;TYPE=WORK:;;Las Piñas City, Metro Manila;;;Philippines',
+        'NOTE:Connected via OneTap NFC Smart Card',
+        'END:VCARD'
+      ].join('\r\n');
+
+      const fileName = 'TITOGAB_OneTap.vcf';
+      const file = new File([vcardText], fileName, { type: 'text/vcard;charset=utf-8' });
+
+      // Strategy 1: Native Share sheet (Android opens Contacts app directly without needing to search Downloads)
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: 'TITOGAB Contact',
+            text: 'Save TITOGAB to Contacts'
+          });
+          return;
+        } catch (err) {
+          if (err.name !== 'AbortError') {
+            console.log('Share fallback:', err);
+          } else {
+            return;
+          }
         }
+      }
 
-        dismissToastBtn.addEventListener('click', () => {
-            toast.classList.remove('active');
-        });
+      // Strategy 2: Direct Blob download fallback
+      const blob = new Blob([vcardText], { type: 'text/vcard;charset=utf-8' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
 
-        // Clipboard Copy Helper
-        function copyToClipboard(text, successMsg) {
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).then(() => {
-                    notify(successMsg);
-                }).catch(() => {
-                    legacyCopy(text, successMsg);
-                });
-            } else {
-                legacyCopy(text, successMsg);
-            }
-        }
+      setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      }, 300);
 
-        function legacyCopy(text, successMsg) {
-            const input = document.createElement('input');
-            input.value = text;
-            document.body.appendChild(input);
-            input.select();
-            document.execCommand('copy');
-            document.body.removeChild(input);
-            notify(successMsg);
-        }
+      showToast('Contact file ready! Tap to add to Contacts.');
+    }
 
-        // Copy buttons listener
-        copyTriggers.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const copyValue = btn.getAttribute('data-copy');
-                copyToClipboard(copyValue, `Copied: ${copyValue}`);
-            });
-        });
+    // Share Profile Link
+    function shareProfile() {
+      if (navigator.share) {
+        navigator.share({
+          title: 'TITOGAB | OneTap Profile',
+          text: 'Connect with TITOGAB via OneTap NFC Smart Card',
+          url: window.location.href,
+        }).catch(() => {});
+      } else {
+        copyText(window.location.href, 'Profile link copied to clipboard!');
+      }
+    }
 
-        // Web Share or Fallback
-        shareProfileBtn.addEventListener('click', async () => {
-            const shareData = {
-                title: 'OneTap Las Piñas',
-                text: 'Connect with OneTap Las Piñas Digital Profile',
-                url: window.location.href
-            };
+    // Copy Utility
+    function copyText(text, successMsg) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(successMsg);
+      }).catch(() => {
+        showToast('Copied: ' + text);
+      });
+    }
 
-            if (navigator.share) {
-                try {
-                    await navigator.share(shareData);
-                } catch (err) {
-                    // user cancelled share
-                }
-            } else {
-                copyToClipboard(window.location.href, 'Profile link copied to clipboard!');
-            }
-        });
-
-        // Generate vCard (.vcf)
-        downloadVcardBtn.addEventListener('click', () => {
-            const vCardContent = [
-                'BEGIN:VCARD',
-                'VERSION:3.0',
-                'FN:OneTap Las Piñas',
-                'ORG:OneTap Las Piñas',
-                'TITLE:Smart NFC Networking & Digital Solutions',
-                'TEL;TYPE=CELL,VOICE:+639123456789',
-                'EMAIL;TYPE=PREF,INTERNET:onetaplaspinas@gmail.com',
-                'ADR;TYPE=WORK:;;Las Piñas City;Metro Manila;;Philippines',
-                'NOTE:Contact saved via OneTap NFC Smart Card',
-                'URL:https://facebook.com',
-                'END:VCARD'
-            ].join('\r\n');
-
-            const blob = new Blob([vCardContent], { type: 'text/vcard;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'OneTap_Las_Pinas.vcf';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-
-            notify('Contact vCard downloaded!');
-        });
-    </script>
+    // Toast Trigger
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2400);
+    }
+  </script>
 </body>
 </html>
