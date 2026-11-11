@@ -444,7 +444,34 @@ async function shareOrCopy(el, text) {
   } catch (e) { /* share cancelled or clipboard unavailable */ }
 }
 
+function androidContactIntent() {
+  const e = encodeURIComponent;
+  const fallback = e(location.origin + '/contact.vcf');
+  const parts = [
+    'action=android.intent.action.INSERT',
+    'type=vnd.android.cursor.dir/contact',
+    'S.name=' + e(P.name || ''),
+    'S.phone=' + e(P.contact1Value || ''),
+    P.contact2Value ? 'S.secondary_phone=' + e(P.contact2Value) : '',
+    P.email ? 'S.email=' + e(P.email) : '',
+    P.company ? 'S.company=' + e(P.company) : '',
+    P.position ? 'S.job_title=' + e(P.position) : '',
+    P.address ? 'S.postal=' + e(P.address) : '',
+    P.bio ? 'S.notes=' + e(P.bio) : '',
+    'S.browser_fallback_url=' + fallback
+  ].filter(Boolean);
+  return 'intent:#Intent;' + parts.join(';') + ';end';
+}
+
 function saveContact() {
+  const ua = navigator.userAgent;
+  const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (/Android/i.test(ua)) { location.href = androidContactIntent(); return; }
+  if (isIOS) { location.href = '/contact.vcf'; return; }
+  downloadVCard();
+}
+
+function downloadVCard() {
   const escapeVCard = value => String(value || '').replace(/\\/g, '\\\\').replace(/\r?\n/g, '\\n').replace(/,/g, '\\,').replace(/;/g, '\\;');
   const lines = [
     'BEGIN:VCARD',
