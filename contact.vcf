@@ -1,15 +1,13 @@
 BEGIN:VCARD
 VERSION:3.0
-FN:Onetaplaspinas
-N:Onetap;;;;
-ORG:onetaplaspinas
+FN:manvartours
+N:manvartours;;;;
+ORG:manvartours
 TITLE:Owner
-NOTE:endless connection for you and your businesss
-TEL;TYPE=CELL:0991 062 4915
-TEL;TYPE=CELL:0962 423 8760
-EMAIL;TYPE=INTERNET:onetaplaspinas@gmail.com
-ADR;TYPE=WORK:;;las Piñas City\, Philippines 1740;;;;
-URL:https://www.facebook.com/onetap.nfc.ph
-X-SOCIALPROFILE;TYPE=facebook:https://www.facebook.com/onetap.nfc.ph
-X-SOCIALPROFILE;TYPE=instagram:https://www.instagram.com/onetap.laspinas/
+NOTE:Tours & Transport Services
+TEL;TYPE=CELL:09605939858
+TEL;TYPE=CELL:09163701981
+ADR;TYPE=WORK:;;Parañaque, Philippines;;;;
+URL:https://www.facebook.com/profile.php?id=100063941924106
+X-SOCIALPROFILE;TYPE=instagram:https://www.instagram.com/manvartours?fbclid=IwY2xjawVkw8FleHRuA2FlbQIxMABwZG9mBWJyaWQRMUx0UmlkWFdTYUpId2w4TnlzcnRjBmFwcF9pZBAyMjIwMzkxNzg4MjAwODkyAAEfFdV8cXGMRnukgtC5zge4exV7eOtm9NUzlbFYv28ChDkCiFuCPTJITrbmuXw_aem_jRYnqNl6T4ELZfOHvyJdNg
 END:VCARD
